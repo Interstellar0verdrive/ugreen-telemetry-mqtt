@@ -4,7 +4,7 @@ Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant throug
 
 > A browser-based UGOS Docker setup is under development. On the DXP4800 Pro, its two-container pilot now publishes to the real Home Assistant broker under the historical device ID. The NAS, broker add-on, and Home Assistant Core were restarted separately on October 27, 2026; the pilot resumed publishing without manual container starts or duplicate devices. The NAS logged sustained HDD sleep while the isolated reader ran, but a specific standby-skip sample was not directly verified. A local upgrade between two code versions and rollback passed; a published-image update remains untested. See the [UI prototype notes](docs/ugos-ui-prototype.md). The documented SSH installer remains the established installation path for now.
 
-The intended no-SSH installation is one UGOS Docker project using a published image and a browser wizard. It is still a development path. Its two containers use the same image: one handles setup and MQTT, while the other reads selected disks without network access. A [future GHCR Compose template](compose.ugos.ghcr.example.yaml) and [release workflow](.github/workflows/publish-image.yml) are present for inspection; they are not a published installation yet.
+The intended no-SSH installation is one UGOS Docker project using a published image and a browser wizard. It is still a development path. Its two containers use the same image: one handles setup and MQTT, while the other reads selected disks without network access. The [GHCR Compose template](compose.ugos.ghcr.example.yaml) and [release workflow](.github/workflows/publish-image.yml) are available for inspection. Private `v0.3.0.dev1` and `v0.3.0.dev2` prerelease images have been published for an upgrade test; a registry-image installation on UGOS has not yet been verified.
 
 For an existing host-installer deployment, see the [draft migration and rollback plan](docs/migration-from-host-installer.md). It is not a tested cutover procedure yet.
 
@@ -75,7 +75,7 @@ If Home Assistant already knows the same NAS from an earlier version, it keeps e
 | `host-smart-snapshot.py`, `systemd/` | Local SMART/volume sampling and timer |
 | `src/ugreen_telemetry/` | Unprivileged MQTT publisher |
 | `compose*.yaml`, `Dockerfile` | Container configuration and build |
-| `.github/workflows/` | Tests and future GHCR image publication on release |
+| `.github/workflows/` | Tests and GHCR image publication on release |
 | `tests/` | Simulated sensor, installer, and MQTT tests |
 | `docs/` | Installation, restarts, security, impact, and release notes |
 
