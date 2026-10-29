@@ -8,6 +8,10 @@ This is an experimental guide. The single-file installer was tested from a clean
 2. Enable Docker on the NAS and prepare an administrator SSH session. The installer requires Python 3, Docker Compose, systemd, and `/usr/sbin/smartctl`.
 3. In UGOS Storage, identify the SATA disks and mounted data volumes you want to monitor. The installer displays Linux candidates, but you must confirm that the chosen disks belong to the intended pool.
 
+![Illustration of matching UGOS Storage disks to installer candidates](images/installer-selection.png)
+
+*Illustration with sample names; verify the actual disks on your NAS before selecting them.*
+
 The package runs a root-owned host helper for SMART reads and an unprivileged container for MQTT publishing. Installation creates `/root/ugreen-telemetry-mqtt`, two systemd unit files, a local configuration and MQTT secret, and a Docker image. These host files are necessary because a fully containerized SMART reader would need direct disk access. The installer does not overwrite an existing setup.
 
 ## Guided setup

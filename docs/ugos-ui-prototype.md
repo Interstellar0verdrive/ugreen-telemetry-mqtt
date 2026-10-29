@@ -1,12 +1,24 @@
 # UGOS Docker setup UI prototype
 
-This is development code. It has not replaced the tested SSH installer or the running telemetry installation. Do not publish it as a release until the device-access, restart, update and security tests are complete.
+This is development code. It has not replaced the tested SSH installer. A private two-container pilot has run against the real broker; fresh installation and public-release update behavior still need validation before this becomes a supported release.
+
+The screens below are **illustrations with fictional values**, not captures of the live NAS or instructions to copy their settings.
 
 ## Intended user journey
 
 1. In UGOS Docker, create one **project** from a short Compose file that points at a tagged GHCR image.
 2. Open `http://NAS-IP:8765` on the trusted LAN. In the UGOS Docker project, select the `setup` container and copy the setup token from its Logs tab. The `reader` container has a separate log.
+
+   ![Illustrative setup-token screen with a hidden token](images/wizard-token.png)
+
 3. The wizard lists SATA disks by Linux name and shows their HDD/SSD type. Compare the names with UGOS Storage, select the disks and volumes, then enter a dedicated MQTT login and choose reading groups.
+
+   ![Illustrative NAS and MQTT wizard screen](images/wizard-nas-mqtt.png)
+
+   ![Illustrative disks and volumes wizard screen](images/wizard-disks-volumes.png)
+
+   ![Illustrative readings and interval selection screen](images/wizard-readings.png)
+
 4. Save. Each reading uses the selected update interval. The isolated reader schedules SMART checks separately from volume-space checks; SMART intervals have a five-minute minimum. The unprivileged service publishes standard MQTT state topics and Home Assistant MQTT Discovery.
 5. For a later release, review its changelog and use the project's image update control in UGOS. The configuration and MQTT password volumes retain their contents across image replacement. The temporary reader targets and samples are rebuilt after a restart.
 
@@ -15,6 +27,8 @@ The UI uses local HTTP, so the setup token and MQTT password travel unencrypted 
 ## Why the project has two containers
 
 Docker fixes device access when a container starts. A wizard cannot discover a disk and grant itself access to that disk later without the Docker control socket or broad initial device access. The reader therefore has device access from the start, but no network, MQTT password, or web port. The setup and MQTT container has network access and the MQTT password, but no disk devices. Both services use the same image and are managed as one UGOS Docker project.
+
+![Illustrative architecture of the two-container browser pilot](images/architecture.png)
 
 The reader sees the host `/dev` directory read-only, has a device cgroup rule for read access to SATA block major 8, and receives `CAP_SYS_RAWIO` for the tested SAT path. This is broader than mapping one named disk and still needs NAS-side validation. A read-only device mapping is not a guarantee that every possible device command is harmless. The reader uses only allowlisted `/dev/sd*` paths selected in the wizard and runs `smartctl -d sat -n standby,0 -A` without `--allow-wake`.
 
@@ -26,7 +40,7 @@ The example Compose file keeps configuration and secrets in persistent Docker vo
 
 - Only `/volume1` is mounted for filesystem-space readings in the example Compose file. Other mounted data volumes require adding matching read-only mounts to the reader and listing them in `AVAILABLE_VOLUME_PATHS` on the setup service.
 - The reviewed wizard and per-reading interval controls passed local tests and browser review with dummy data. On October 26, 2026 the isolated NAS project was rebuilt with image `ui-reviewed-dev1`; the authenticated wizard showed its prior saved settings, and the internal broker accepted fresh state topics for four HDD temperatures, the selected volume, CPU, and memory. Exact values were not visible in the UGOS broker log.
-- The development Compose file uses a local build and does not provide an UGOS update badge. A versioned, published GHCR image is required. A future release template and image-publishing workflow are in the repository but have not been exercised with a public image or an UGOS update.
+- The development Compose file uses a local build and does not provide an UGOS update badge. Private GHCR `v0.3.0.dev1` and `v0.3.0.dev2` images were pulled and switched in the existing pilot, then it was restored to the local image. The release template and image-publishing workflow have not been exercised with a public image or an UGOS update badge.
 - Setup changes restart the MQTT publisher. Home Assistant may retain old MQTT Discovery entities after a sensor group is disabled; cleanup of stale discovery entries is not implemented yet.
 - There is no setup-page TLS. The page is intended for a trusted LAN only.
 - Two one-shot UGOS probes reached `/dev/sda`, first through a dynamic read-only `/dev` mount and then through Docker's explicit read-only device mapping. Both granted `CAP_SYS_RAWIO`; the second verified it was effective in the process. Both still got `EACCES` on the ATA power-mode ioctl. The NAS runs Linux 6.18.15, whose ATA ioctl path requires both `CAP_SYS_ADMIN` and `CAP_SYS_RAWIO`. The SLEEP response masks that denial and does not establish the disk's power state. A third one-shot probe used the SAT path with only `CAP_SYS_RAWIO`; the power-mode check succeeded and SMART attributes 190 and 194 reported 45 C on one active HDD. This validates SAT on that device, but not the full reader, sleeping-disk behavior, or other models. The web process must not inherit raw I/O capability in a releasable design.
@@ -36,7 +50,7 @@ The example Compose file keeps configuration and secrets in persistent Docker vo
 - A read-only filesystem check in the isolated reader showed that Docker's named volumes for configuration and snapshots were on `/volume1`, the HDD data pool. The next revision moved temporary targets and samples into a shared memory-backed volume and suppressed routine success logs. UGOS rebuilt both project containers with this revision. In the reader, `df -T` reported `tmpfs` for `/snapshots` and Btrfs for `/host/volume1`; both temporary files existed after restart, and the internal MQTT broker returned the retained volume-used value. During a later active-disk trial, all four HDDs showed thousands of reads in ten seconds, but the container reported zero HDD samples. `smartctl -r ioctl,1` showed `CHECK POWER MODE returned -1 errno=13 [Permission denied]`; its SLEEP message was not a real power-state measurement. Device-access permissions need correction before a disk-standby or active-SMART claim.
 - An approved SAT revision gave only the reader `CAP_SYS_RAWIO` and kept it without network or MQTT credentials. The reader then produced temperatures and Start/Stop and Load Cycle counters for all four active HDDs. The test still cannot establish behavior while an HDD is genuinely in standby. The host-based telemetry was later stopped reversibly so the SAT reader could be observed without a second project polling SMART.
 - The source normalizes sysfs paths before deriving HDD IDs and labels `/volume1` as `data` in the wizard. Both changes are in the October 26 isolated image. A read-only comparison with the historical Home Assistant MQTT registry confirmed all four HDD IDs (`sda`–`sdd`) and the `data` volume label. The isolated project uses NAS ID `ugreen-isolated-test`; the historical device uses `dxp4800pro`. Set the latter in a real-broker pilot to preserve entity identity, then re-enable the existing Home Assistant device after confirming MQTT publication.
-- A separate two-container pilot connected to the real broker on October 27, 2026. Its settings and historical Home Assistant device survived separate NAS, broker add-on, and Home Assistant Core restarts, plus a small local `0.3.0.dev1` → `0.3.0.dev2` code upgrade and rollback. Fresh install by another user, a registry-image update, configuration migrations, two-bay NAS layouts, and compatibility with other UGREEN models remain unverified. A scheduled reader sample while disks were in standby was not directly observed.
+- A separate two-container pilot connected to the real broker on October 27, 2026. Its settings and historical Home Assistant device survived separate NAS, broker add-on, and Home Assistant Core restarts, plus a small local `0.3.0.dev1` → `0.3.0.dev2` code upgrade and rollback. A later private GHCR `dev1` → `dev2` → `dev1` image switch and return to the local image also retained settings and device identity. Fresh install by another user, a public image update, configuration migrations, two-bay NAS layouts, and compatibility with other UGREEN models remain unverified. A scheduled reader sample while disks were in standby was not directly observed.
 
 ## Source layout
 

@@ -1,10 +1,19 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/ugreen_telemetry/web_assets/app-icon-dark.png">
+    <img src="src/ugreen_telemetry/web_assets/app-icon-light.png" width="108" alt="UGREEN Telemetry app icon">
+  </picture>
+</p>
+
 # UGREEN Telemetry MQTT
+
+![A visual summary of NAS readings published through MQTT](docs/images/hero-flow.png)
 
 Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
 
-> A browser-based UGOS Docker setup is under development. On the DXP4800 Pro, its two-container pilot now publishes to the real Home Assistant broker under the historical device ID. The NAS, broker add-on, and Home Assistant Core were restarted separately on October 27, 2026; the pilot resumed publishing without manual container starts or duplicate devices. The NAS logged sustained HDD sleep while the isolated reader ran, but a specific standby-skip sample was not directly verified. A local upgrade between two code versions and rollback passed; a published-image update remains untested. See the [UI prototype notes](docs/ugos-ui-prototype.md). The documented SSH installer remains the established installation path for now.
+> A browser-based UGOS Docker setup is under development. On the DXP4800 Pro, its two-container pilot now publishes to the real Home Assistant broker under the historical device ID. The NAS, broker add-on, and Home Assistant Core were restarted separately on October 27, 2026; the pilot resumed publishing without manual container starts or duplicate devices. The NAS logged sustained HDD sleep while the isolated reader ran, but a specific standby-skip sample was not directly verified. Both a local code-version upgrade and a private GHCR image upgrade with rollback passed. A public release update remains untested. See the [UI prototype notes](docs/ugos-ui-prototype.md). The documented SSH installer remains the established installation path for now.
 
-The intended no-SSH installation is one UGOS Docker project using a published image and a browser wizard. It is still a development path. Its two containers use the same image: one handles setup and MQTT, while the other reads selected disks without network access. The [GHCR Compose template](compose.ugos.ghcr.example.yaml) and [release workflow](.github/workflows/publish-image.yml) are available for inspection. Private `v0.3.0.dev1` and `v0.3.0.dev2` prerelease images have been published for an upgrade test; a registry-image installation on UGOS has not yet been verified.
+The intended no-SSH installation is one UGOS Docker project using a published image and a browser wizard. It is still a development path. Its two containers use the same image: one handles setup and MQTT, while the other reads selected disks without network access. The [GHCR Compose template](compose.ugos.ghcr.example.yaml) and [release workflow](.github/workflows/publish-image.yml) are available for inspection. Private `v0.3.0.dev1` and `v0.3.0.dev2` prerelease images were pulled by UGOS and tested in an upgrade and rollback of the existing pilot. A fresh installation from a public image has not been verified.
 
 For an existing host-installer deployment, see the [draft migration and rollback plan](docs/migration-from-host-installer.md). It is not a tested cutover procedure yet.
 
@@ -14,17 +23,27 @@ I built this primarily for my own NAS and am sharing it in case it helps someone
 
 Other NAS monitoring projects already exist and may be a better fit for many people. For my setup, I wanted a smaller path that keeps the NAS administrator account on the NAS. A host-side helper reads SMART and volume usage locally; a restricted container publishes selected readings to MQTT. Home Assistant only connects to the broker. It never receives NAS administrator credentials. This separation was the reason for writing the project, not a criticism of other approaches.
 
+The developing browser pilot keeps the same separation within one UGOS Docker project:
+
+![Illustrative architecture of the two-container browser pilot](docs/images/architecture.png)
+
+*Architecture illustration; the SSH installer described below uses a host helper instead of a reader container.*
+
 ## Current status
 
-This is a **prototype**, not yet a supported public release. Guided installation, four SATA HDDs, one data volume, the systemd timer, Docker publisher, MQTT 5, and Home Assistant Discovery were tested from a clean NAS-side install on a DXP4800 Pro running UGOS Pro 1.20.0.0142. The browser pilot was tested against the real broker, through separate NAS, broker add-on, and Home Assistant Core restarts, and through a local `0.3.0.dev1` → `0.3.0.dev2` code upgrade and rollback. A two-bay layout has simulated tests only. Compatibility with another UGREEN model, a directly observed standby-skip sample, a registry-image update, and configuration migrations still need validation.
+This is a **prototype**, not yet a supported public release. Guided installation, four SATA HDDs, one data volume, the systemd timer, Docker publisher, MQTT 5, and Home Assistant Discovery were tested from a clean NAS-side install on a DXP4800 Pro running UGOS Pro 1.20.0.0142. The browser pilot was tested against the real broker, through separate NAS, broker add-on, and Home Assistant Core restarts, a local `0.3.0.dev1` → `0.3.0.dev2` code upgrade and rollback, and a private GHCR `dev1` → `dev2` → `dev1` image upgrade followed by restoration of the local image. A two-bay layout has simulated tests only. Compatibility with another UGREEN model, a directly observed standby-skip sample, a public image update, and configuration migrations still need validation.
 
 | Reading | Interval | Home Assistant default |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | CPU usage, memory usage | 60 seconds | Enabled |
 | CPU temperature, detected SSD/NVMe temperature, HDD temperature, maximum HDD temperature, volume usage, uptime | 15 minutes | Enabled |
 | Supported HDD SMART counters | 15 minutes | Disabled; opt in per entity |
 
 The number of readings depends on the selected disks, mounted volumes, and sensors exposed by the NAS. A missing SMART attribute does not appear as zero.
+
+The browser pilot lets you select each reading and its interval. This is an illustration with sample values, not a capture from the tested NAS:
+
+![Illustrative Readings to publish screen](docs/images/wizard-readings.png)
 
 ## Inspect the code before installing
 
@@ -49,11 +68,13 @@ sudo python3 ugreen-telemetry-mqtt-setup.pyz
 
 The guided setup lists candidate SATA disks and mounted volumes. Check the disk choices against UGOS Storage, enter the broker address and dedicated MQTT username, review the targets, then enter the password at the hidden prompt. Setup creates a private installation under `/root/ugreen-telemetry-mqtt`, a systemd timer for SMART snapshots, and a Docker Compose service for MQTT. The first image build needs Internet access. Details and a two-bay example are in [installation guidance](docs/installation.md).
 
+For a preview of the separate browser pilot's token, NAS/MQTT, and disk selection screens, see the [illustrated UGOS UI guide](docs/ugos-ui-prototype.md). Those screens are not part of the SSH installer above.
+
 The installer **refuses to overwrite an existing installation**. Do not rerun it as an update. An in-place updater and guided uninstaller are still planned; the [changelog](CHANGELOG.md) and [release and update policy](docs/release-and-updates.md) describe what is and is not supported today.
 
 ## Behavior after restarts
 
-The SSH installer enables the systemd timer, and Compose uses `restart: unless-stopped` for its publisher. If that container was intentionally stopped, Docker leaves it stopped after reboot. The timer does not replay missed samples. The separate browser pilot uses two containers and a RAM-backed snapshot: both came back after an October 27 NAS reboot; HDD temperatures returned on the next reader sample. The same Home Assistant device received fresh CPU and memory values after separate broker add-on and Home Assistant Core restarts. A local two-code-version upgrade and rollback also recovered the existing device and HDD readings; published-image upgrades remain untested. See [restart and storage notes](docs/restarts-and-storage.md).
+The SSH installer enables the systemd timer, and Compose uses `restart: unless-stopped` for its publisher. If that container was intentionally stopped, Docker leaves it stopped after reboot. The timer does not replay missed samples. The separate browser pilot uses two containers and a RAM-backed snapshot: both came back after an October 27 NAS reboot; HDD temperatures returned on the next reader sample. The same Home Assistant device received fresh CPU and memory values after separate broker add-on and Home Assistant Core restarts. A local code-version upgrade with rollback recovered the existing device and HDD readings. A later private GHCR image upgrade with rollback preserved settings and the same device; fresh HDD values were not confirmed in that specific test. See [restart and storage notes](docs/restarts-and-storage.md).
 
 ## Storage and load
 
@@ -62,6 +83,10 @@ The publisher retains only the latest MQTT values, rather than an ever-growing M
 ## Security and limitations
 
 The host helper runs as root because ordinary users could not open the SATA devices on the tested NAS. It writes a small allowlisted JSON snapshot. The MQTT container runs as UID 10001, has a read-only root filesystem, drops Linux capabilities, has no inbound port or Docker socket, and mounts only sysfs and the snapshot read-only. The dedicated MQTT password stays on the NAS. MQTT without TLS still sends that password in clear text on the local network; use TLS on an untrusted network and verify any broker ACL you rely on. See the [security model](docs/security-model.md).
+
+The developing browser pilot asks for the dedicated MQTT login in its NAS and MQTT screen. This illustration uses a fictional host and masked password:
+
+![Illustrative NAS and MQTT setup screen with sample values](docs/images/wizard-nas-mqtt.png)
 
 `smartctl -n standby,0` attempts to avoid waking sleeping disks, but controller behavior varies. During an approximately eight-hour trial on the DXP4800 Pro, HDD Start/Stop and Load Cycle counters did not increase; UGOS disk suspension was disabled, so this does not prove sleep-safe polling. See [monitoring impact](docs/monitoring-impact.md).
 
