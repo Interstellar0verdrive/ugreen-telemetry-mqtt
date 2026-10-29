@@ -1,16 +1,18 @@
+# UGREEN Telemetry MQTT
+
 <img align="right" src="src/ugreen_telemetry/web_assets/app-icon-light.png#gh-light-mode-only" width="96" alt="UGREEN Telemetry app icon, light variant">
 <img align="right" src="src/ugreen_telemetry/web_assets/app-icon-dark.png#gh-dark-mode-only" width="96" alt="UGREEN Telemetry app icon, dark variant">
 
-# UGREEN Telemetry MQTT
+Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
+
+A browser wizard for choosing NAS readings and their publishing intervals is in development. The documented SSH installer remains the established installation path.
 
 <p align="center">
   <img src="docs/images/readme-preview-light.svg#gh-light-mode-only" alt="Light-mode mockup of Readings to publish" width="100%">
   <img src="docs/images/readme-preview-dark.svg#gh-dark-mode-only" alt="Dark-mode mockup of Readings to publish" width="100%">
 </p>
 
-Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
-
-> A browser-based UGOS Docker setup is under development. On the DXP4800 Pro, its two-container pilot now publishes to the real Home Assistant broker under the historical device ID. The NAS, broker add-on, and Home Assistant Core were restarted separately on October 27, 2026; the pilot resumed publishing without manual container starts or duplicate devices. The NAS logged sustained HDD sleep while the isolated reader ran, but a specific standby-skip sample was not directly verified. Both a local code-version upgrade and a private GHCR image upgrade with rollback passed. A public release update remains untested. See the [UI prototype notes](docs/ugos-ui-prototype.md). The documented SSH installer remains the established installation path for now.
+> A browser-based UGOS Docker setup is under development. On the DXP4800 Pro, its two-container pilot now publishes to the real Home Assistant broker under the historical device ID. The NAS, broker add-on, and Home Assistant Core were restarted separately on October 27, 2026; the pilot resumed publishing without manual container starts or duplicate devices. The NAS logged sustained HDD sleep while the isolated reader ran, but a specific standby-skip sample was not directly verified. Both a local code-version upgrade and a private GHCR image upgrade with rollback passed. A public release update remains untested. See the [UI prototype notes](docs/ugos-ui-prototype.md).
 
 The intended no-SSH installation is one UGOS Docker project using a published image and a browser wizard. It is still a development path. Its two containers use the same image: one handles setup and MQTT, while the other reads selected disks without network access. The [GHCR Compose template](compose.ugos.ghcr.example.yaml) and [release workflow](.github/workflows/publish-image.yml) are available for inspection. Private `v0.3.0.dev1` and `v0.3.0.dev2` prerelease images were pulled by UGOS and tested in an upgrade and rollback of the existing pilot. A fresh installation from a public image has not been verified.
 

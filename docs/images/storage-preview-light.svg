@@ -3,7 +3,7 @@
 <rect x="0" y="0" width="1200" height="800" rx="0" fill="url(#back)" stroke="none" />
 <rect x="82" y="71" width="1036" height="670" rx="23" fill="#124a70" stroke="none" opacity=".25" filter="url(#shadow)"/>
 <rect x="70" y="54" width="1060" height="700" rx="22" fill="#ffffff" stroke="#aac9dc" />
-<rect x="70" y="54" width="1060" height="7" rx="3" fill="#1678c6" stroke="none" />
+<rect x="100" y="65" width="1000" height="5" rx="2.5" fill="#1678c6" stroke="none" />
 <text x="100" y="99" fill="#15344a" font-size="29" font-weight="700" >UGREEN Telemetry</text>
 <text x="100" y="124" fill="#466376" font-size="15" font-weight="400" >Configure which NAS readings to publish to your MQTT broker.</text>
 <rect x="100" y="146" width="1000" height="54" rx="12" fill="#ffffff" stroke="#aac9dc" />

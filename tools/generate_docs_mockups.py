@@ -55,9 +55,9 @@ def reading(x, y, title, sub, minutes, enabled, c):
     fg = c["ink"] if enabled else c["muted"]
     out.append(label(x + 49, y + 32, title, 16, fg, 600))
     out.append(label(x + 49, y + 54, sub, 12.5, c["muted"]))
-    out.append(rect(x + 388, y + 20, 51, 36, 7, c["input"], c["line"]))
-    out.append(label(x + 413.5, y + 44, minutes, 15, fg, 700, 'text-anchor="middle"'))
-    out.append(label(x + 445, y + 44, "min", 12, c["muted"]))
+    out.append(rect(x + 378, y + 20, 51, 36, 7, c["input"], c["line"]))
+    out.append(label(x + 403.5, y + 44, minutes, 15, fg, 700, 'text-anchor="middle"'))
+    out.append(label(x + 435, y + 44, "min", 12, c["muted"]))
     return "\n".join(out)
 
 
@@ -73,7 +73,8 @@ def start(theme, c, height, window_height):
     p.append(rect(0, 0, 1200, height, 0, 'url(#back)'))
     p.append(rect(82, 71, 1036, window_height - 30, 23, c["shadow"], extra='opacity=".25" filter="url(#shadow)"'))
     p.append(rect(70, 54, 1060, window_height, 22, c["surface"], c["line"]))
-    p.append(rect(70, 54, 1060, 7, 3, c["brand"]))
+    # Keep the accent fully inside the rounded frame, clear of its curved corners.
+    p.append(rect(100, 65, 1000, 5, 2.5, c["brand"]))
     p.append(label(100, 99, "UGREEN Telemetry", 29, c["ink"], 700))
     p.append(label(100, 124, "Configure which NAS readings to publish to your MQTT broker.", 15, c["muted"]))
     return p
