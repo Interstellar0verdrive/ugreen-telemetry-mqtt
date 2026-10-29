@@ -4,6 +4,7 @@ All notable changes will be documented here. This project has not made a public 
 
 ## Unreleased
 
+- Prepared development build `0.3.0.dev2` with a setup response version header for a controlled registry-image upgrade and rollback test. Its configuration format and sensor behavior match `0.3.0.dev1`.
 - A private two-service pilot published to the existing Home Assistant MQTT device on a DXP4800 Pro. Settings and sensor identity survived separate NAS, broker add-on, and Home Assistant Core restarts, plus a local upgrade between `0.3.0.dev1` and `0.3.0.dev2` and rollback. A registry-image update, configuration migration, and fresh installation by another user remain untested.
 - Prepared development build `0.3.0.dev1` for the isolated UGOS project. Refined the token screen with a working show/hide control, clearer connection and authentication errors, and stable validation placement. Centered the selected-card check mark.
 - Integrated the reviewed light/dark wizard design with real token access, inventory, configuration save, and responsive controls. Reading intervals are now validated and saved per group; the isolated reader schedules volume and disk samples separately so frequent volume updates do not increase SMART polling.
