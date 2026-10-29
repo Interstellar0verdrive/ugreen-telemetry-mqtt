@@ -1,0 +1,46 @@
+name: ugreen-telemetry
+
+services:
+  telemetry:
+    build: .
+    image: ugreen-telemetry-mqtt:local
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 15s
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 128m
+    logging:
+      driver: local
+      options:
+        max-size: "1m"
+        max-file: "2"
+    environment:
+      NAS_ID: ${NAS_ID:?set NAS_ID in .env}
+      NAS_NAME: ${NAS_NAME:-UGREEN NAS}
+      MQTT_HOST: ${MQTT_HOST:?set MQTT_HOST in .env}
+      MQTT_PORT: ${MQTT_PORT:-1883}
+      MQTT_USER: ${MQTT_USER:?set MQTT_USER in .env}
+      MQTT_PROTOCOL: ${MQTT_PROTOCOL:-3.1.1}
+      MQTT_TLS: ${MQTT_TLS:-false}
+      MQTT_PASSWORD_FILE: /run/secrets/mqtt_password
+      SYS_ROOT: /host/sys
+      FAST_INTERVAL_SECONDS: ${FAST_INTERVAL_SECONDS:-60}
+      HDD_ENABLED: ${HDD_ENABLED:-false}
+      EXPECTED_HDD_COUNT: ${EXPECTED_HDD_COUNT:-0}
+      HDD_INTERVAL_SECONDS: ${HDD_INTERVAL_SECONDS:-900}
+    secrets:
+      - mqtt_password
+    volumes:
+      # Sysfs can expose hardware metadata. It contains no shared folders.
+      # The NAS test must confirm that drivetemp reads do not disturb HDD sleep.
+      - /sys:/host/sys:ro
+
+secrets:
+  mqtt_password:
+    file: ./secrets/mqtt_password.txt

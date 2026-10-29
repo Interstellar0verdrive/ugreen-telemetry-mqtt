@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ugreen-telemetry-mqtt"
+version = "0.3.0.dev1"
+description = "Outbound-only NAS telemetry for Home Assistant MQTT Discovery"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["paho-mqtt==2.1.0"]
+
+[project.scripts]
+ugreen-telemetry = "ugreen_telemetry.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ugreen_telemetry = ["web_assets/*.html", "web_assets/*.css", "web_assets/*.js", "web_assets/*.png"]

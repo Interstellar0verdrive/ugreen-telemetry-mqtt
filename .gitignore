@@ -1,0 +1,13 @@
+__pycache__/
+build/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+secrets/
+.env
+.env.pre-*
+host.json
+snapshots/
+*.pre-cycle-monitor
+build.log

@@ -1,0 +1,69 @@
+# Development Compose project for UGOS Docker. Replace build with a tagged
+# registry image only after a published release has been tested.
+services:
+  setup:
+    build: .
+    image: ugreen-telemetry-mqtt:ui-dev
+    pull_policy: never
+    entrypoint: ["python", "-m", "ugreen_telemetry.web"]
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: 192m
+    logging:
+      driver: local
+      options:
+        max-size: "1m"
+        max-file: "2"
+    ports:
+      - "8765:8765"
+    environment:
+      TARGETS_FILE: /snapshots/targets.json
+    volumes:
+      - telemetry_config:/data
+      - telemetry_secrets:/secrets
+      - telemetry_runtime:/snapshots
+      - /sys:/host/sys:ro
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+  reader:
+    image: ugreen-telemetry-mqtt:ui-dev
+    pull_policy: never
+    entrypoint: ["python", "-m", "ugreen_telemetry.reader"]
+    restart: unless-stopped
+    user: "0:0"
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [SYS_RAWIO]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: 128m
+    logging:
+      driver: local
+      options:
+        max-size: "1m"
+        max-file: "2"
+    device_cgroup_rules:
+      - "b 8:* r"
+    environment:
+      TARGETS_FILE: /snapshots/targets.json
+    volumes:
+      - telemetry_runtime:/snapshots
+      - /sys:/host/sys:ro
+      - /dev:/host/dev:ro
+      - /volume1:/host/volume1:ro
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+volumes:
+  telemetry_config:
+  telemetry_secrets:
+  telemetry_runtime:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=8m,mode=1777

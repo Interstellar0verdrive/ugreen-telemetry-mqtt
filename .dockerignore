@@ -1,0 +1,14 @@
+.git
+.github
+tests
+secrets
+.env
+.env.pre-*
+__pycache__
+*.pyc
+build
+*.egg-info
+host.json
+snapshots
+*.pre-cycle-monitor
+build.log

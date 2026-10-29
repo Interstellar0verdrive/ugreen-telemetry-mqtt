@@ -1,0 +1,19 @@
+name: ugreen-telemetry-probe
+
+services:
+  probe:
+    build: .
+    image: ugreen-telemetry-mqtt:local
+    entrypoint: ["ugreen-telemetry", "--probe"]
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 128m
+    environment:
+      SYS_ROOT: /host/sys
+    volumes:
+      - /sys:/host/sys:ro
