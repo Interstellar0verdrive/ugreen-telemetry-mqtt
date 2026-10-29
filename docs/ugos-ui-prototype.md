@@ -2,22 +2,20 @@
 
 This is development code. It has not replaced the tested SSH installer. A private two-container pilot has run against the real broker; fresh installation and public-release update behavior still need validation before this becomes a supported release.
 
-The screens below are **illustrations with fictional values**, not captures of the live NAS or instructions to copy their settings.
+The screens below were captured from the running DXP4800 Pro pilot in dark mode. The token field is empty and no broker credentials or disk serial numbers are shown. The chosen disks and intervals describe that pilot, not settings to copy to another NAS.
 
 ## Intended user journey
 
 1. In UGOS Docker, create one **project** from a short Compose file that points at a tagged GHCR image.
 2. Open `http://NAS-IP:8765` on the trusted LAN. In the UGOS Docker project, select the `setup` container and copy the setup token from its Logs tab. The `reader` container has a separate log.
 
-   ![Illustrative setup-token screen with a hidden token](images/wizard-token.png)
+   ![The pilot's setup-token screen, without an entered token](images/ui-token-dark.jpg)
 
 3. The wizard lists SATA disks by Linux name and shows their HDD/SSD type. Compare the names with UGOS Storage, select the disks and volumes, then enter a dedicated MQTT login and choose reading groups.
 
-   ![Illustrative NAS and MQTT wizard screen](images/wizard-nas-mqtt.png)
+   ![Disks and volumes in the running DXP4800 Pro pilot](images/ui-disks-dark.jpg)
 
-   ![Illustrative disks and volumes wizard screen](images/wizard-disks-volumes.png)
-
-   ![Illustrative readings and interval selection screen](images/wizard-readings.png)
+   ![Readings and intervals in the running DXP4800 Pro pilot](images/ui-readings-dark.jpg)
 
 4. Save. Each reading uses the selected update interval. The isolated reader schedules SMART checks separately from volume-space checks; SMART intervals have a five-minute minimum. The unprivileged service publishes standard MQTT state topics and Home Assistant MQTT Discovery.
 5. For a later release, review its changelog and use the project's image update control in UGOS. The configuration and MQTT password volumes retain their contents across image replacement. The temporary reader targets and samples are rebuilt after a restart.
@@ -27,8 +25,6 @@ The UI uses local HTTP, so the setup token and MQTT password travel unencrypted 
 ## Why the project has two containers
 
 Docker fixes device access when a container starts. A wizard cannot discover a disk and grant itself access to that disk later without the Docker control socket or broad initial device access. The reader therefore has device access from the start, but no network, MQTT password, or web port. The setup and MQTT container has network access and the MQTT password, but no disk devices. Both services use the same image and are managed as one UGOS Docker project.
-
-![Illustrative architecture of the two-container browser pilot](images/architecture.png)
 
 The reader sees the host `/dev` directory read-only, has a device cgroup rule for read access to SATA block major 8, and receives `CAP_SYS_RAWIO` for the tested SAT path. This is broader than mapping one named disk and still needs NAS-side validation. A read-only device mapping is not a guarantee that every possible device command is harmless. The reader uses only allowlisted `/dev/sd*` paths selected in the wizard and runs `smartctl -d sat -n standby,0 -A` without `--allow-wake`.
 

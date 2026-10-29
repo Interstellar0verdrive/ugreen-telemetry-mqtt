@@ -2,10 +2,6 @@
 
 This remains a **draft migration plan**, not a tested release procedure. A reversible two-service pilot was connected to the live Home Assistant broker on October 27, 2026. The old publisher and host snapshot timer remain stopped; after the NAS reboot, the user verified the timer was still `disabled` and `inactive`. The isolated test project remains available. A local upgrade from `0.3.0.dev1` to `0.3.0.dev2` and rollback passed, as did a private GHCR image switch and rollback. A public release update, configuration migrations, and a fresh user installation still need validation before treating this as a release procedure.
 
-![Illustrative sequence for cutover, identity check, and rollback](images/migration-cutover.png)
-
-*The sequence is a planning aid, not a completed migration procedure.*
-
 The pilot reused NAS ID `dxp4800pro` and the existing `DXP4800 Pro` MQTT device. After an initial reader snapshot delay, Home Assistant received new CPU, memory, and all four HDD temperature values on the historical entity IDs. Restarting the pilot setup/MQTT container preserved its configuration. After separate NAS, broker add-on, and Home Assistant Core restarts, publication resumed on the same device with 38 entities and no duplicate. The two historical volume entities remain disabled by user preference; MQTT Explorer confirmed the candidate's `data` available-space and used-percent topics have retained states and `online` availability.
 
 On October 26, 2026, a read-only comparison of the historical Home Assistant MQTT registry and the isolated broker log confirmed that all four HDD temperature keys match (`sda`–`sdd`). The historical NAS ID is `dxp4800pro`, while the isolated test still uses `ugreen-isolated-test`; set the real-broker configuration to the historical NAS ID before publishing there. The candidate uses volume label `data`, matching the historical `volume_data` entity. An older `volume_data1` entity also remains in the registry and should be reviewed separately after the pilot.

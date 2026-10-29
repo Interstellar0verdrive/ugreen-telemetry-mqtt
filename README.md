@@ -7,7 +7,12 @@
 
 # UGREEN Telemetry MQTT
 
-![A visual summary of NAS readings published through MQTT](docs/images/hero-flow.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/readme-preview-dark.svg">
+    <img src="docs/images/readme-preview-light.svg" alt="Mockup of the Readings to publish screen in the UGREEN Telemetry setup wizard" width="100%">
+  </picture>
+</p>
 
 Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
 
@@ -23,11 +28,7 @@ I built this primarily for my own NAS and am sharing it in case it helps someone
 
 Other NAS monitoring projects already exist and may be a better fit for many people. For my setup, I wanted a smaller path that keeps the NAS administrator account on the NAS. A host-side helper reads SMART and volume usage locally; a restricted container publishes selected readings to MQTT. Home Assistant only connects to the broker. It never receives NAS administrator credentials. This separation was the reason for writing the project, not a criticism of other approaches.
 
-The developing browser pilot keeps the same separation within one UGOS Docker project:
-
-![Illustrative architecture of the two-container browser pilot](docs/images/architecture.png)
-
-*Architecture illustration; the SSH installer described below uses a host helper instead of a reader container.*
+The developing browser pilot keeps the same separation within one UGOS Docker project. Its reader container accesses the selected disks and writes a RAM-backed snapshot without network access. Its setup/publisher container uses that snapshot and the dedicated MQTT login to publish readings. The SSH installer described below uses a host helper instead of a reader container.
 
 ## Current status
 
@@ -41,9 +42,11 @@ This is a **prototype**, not yet a supported public release. Guided installation
 
 The number of readings depends on the selected disks, mounted volumes, and sensors exposed by the NAS. A missing SMART attribute does not appear as zero.
 
-The browser pilot lets you select each reading and its interval. This is an illustration with sample values, not a capture from the tested NAS:
+The browser pilot lets you select each reading and its interval. The mockup above uses the current wizard labels and the choices from the tested DXP4800 Pro pilot; actual choices depend on the NAS. See the [screens from the running pilot](docs/ugos-ui-prototype.md).
 
-![Illustrative Readings to publish screen](docs/images/wizard-readings.png)
+<p align="center">
+  <img src="docs/images/ui-disks-dark.jpg" width="720" alt="Dark-mode screenshot of the pilot's Disks and volumes screen with four SATA HDDs and one mounted data volume selected">
+</p>
 
 ## Inspect the code before installing
 
@@ -84,9 +87,7 @@ The publisher retains only the latest MQTT values, rather than an ever-growing M
 
 The host helper runs as root because ordinary users could not open the SATA devices on the tested NAS. It writes a small allowlisted JSON snapshot. The MQTT container runs as UID 10001, has a read-only root filesystem, drops Linux capabilities, has no inbound port or Docker socket, and mounts only sysfs and the snapshot read-only. The dedicated MQTT password stays on the NAS. MQTT without TLS still sends that password in clear text on the local network; use TLS on an untrusted network and verify any broker ACL you rely on. See the [security model](docs/security-model.md).
 
-The developing browser pilot asks for the dedicated MQTT login in its NAS and MQTT screen. This illustration uses a fictional host and masked password:
-
-![Illustrative NAS and MQTT setup screen with sample values](docs/images/wizard-nas-mqtt.png)
+The developing browser pilot asks for the dedicated MQTT login in its NAS and MQTT screen. The password stays on the NAS and is hidden by default in the browser wizard.
 
 `smartctl -n standby,0` attempts to avoid waking sleeping disks, but controller behavior varies. During an approximately eight-hour trial on the DXP4800 Pro, HDD Start/Stop and Load Cycle counters did not increase; UGOS disk suspension was disabled, so this does not prove sleep-safe polling. See [monitoring impact](docs/monitoring-impact.md).
 
