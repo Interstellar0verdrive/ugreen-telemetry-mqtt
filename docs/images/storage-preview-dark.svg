@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" font-family="Arial, Helvetica, sans-serif" aria-label="UGREEN Telemetry UI mockup, dark theme">
+<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="17"/></filter><linearGradient id="back" x2="1" y2="1"><stop stop-color="#0c2033"/><stop offset="1" stop-color="#10283d"/></linearGradient></defs>
+<rect x="0" y="0" width="1200" height="800" rx="0" fill="url(#back)" stroke="none" />
+<rect x="82" y="71" width="1036" height="670" rx="23" fill="#020a12" stroke="none" opacity=".25" filter="url(#shadow)"/>
+<rect x="70" y="54" width="1060" height="700" rx="22" fill="#172e43" stroke="#547b98" />
+<rect x="70" y="54" width="1060" height="7" rx="3" fill="#258dcf" stroke="none" />
+<text x="100" y="99" fill="#f5fbff" font-size="29" font-weight="700" >UGREEN Telemetry</text>
+<text x="100" y="124" fill="#c0d7e7" font-size="15" font-weight="400" >Configure which NAS readings to publish to your MQTT broker.</text>
+<rect x="100" y="146" width="1000" height="54" rx="12" fill="#172e43" stroke="#547b98" />
+<rect x="438" y="152" width="324" height="42" rx="9" fill="#258dcf" stroke="none" />
+<text x="267" y="179" fill="#c0d7e7" font-size="15" font-weight="700" text-anchor="middle">NAS and MQTT</text>
+<text x="600" y="179" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">Disks and volumes</text>
+<text x="933" y="179" fill="#c0d7e7" font-size="15" font-weight="700" text-anchor="middle">Readings to publish</text>
+<text x="100" y="246" fill="#f5fbff" font-size="24" font-weight="700" >Disks and volumes</text>
+<text x="100" y="273" fill="#c0d7e7" font-size="15" font-weight="400" >Choose only the storage you want to monitor. No serial numbers are displayed.</text>
+<text x="100" y="319" fill="#f5fbff" font-size="18" font-weight="700" >Detected SATA disks</text>
+<text x="1098" y="319" fill="#258dcf" font-size="14" font-weight="700" text-anchor="end">4 selected</text>
+<rect x="100" y="339" width="474" height="70" rx="10" fill="#224b69" stroke="#547b98" />
+<rect x="116" y="364" width="20" height="20" rx="4" fill="#258dcf" stroke="#258dcf" />
+<path d="M121 373 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="149" y="370" fill="#f5fbff" font-size="17" font-weight="700" >HDD sda</text>
+<text x="149" y="392" fill="#c0d7e7" font-size="13" font-weight="400" >/dev/sda · SATA hard drive</text>
+<rect x="607" y="339" width="474" height="70" rx="10" fill="#224b69" stroke="#547b98" />
+<rect x="623" y="364" width="20" height="20" rx="4" fill="#258dcf" stroke="#258dcf" />
+<path d="M628 373 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="656" y="370" fill="#f5fbff" font-size="17" font-weight="700" >HDD sdb</text>
+<text x="656" y="392" fill="#c0d7e7" font-size="13" font-weight="400" >/dev/sdb · SATA hard drive</text>
+<rect x="100" y="421" width="474" height="70" rx="10" fill="#224b69" stroke="#547b98" />
+<rect x="116" y="446" width="20" height="20" rx="4" fill="#258dcf" stroke="#258dcf" />
+<path d="M121 455 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="149" y="452" fill="#f5fbff" font-size="17" font-weight="700" >HDD sdc</text>
+<text x="149" y="474" fill="#c0d7e7" font-size="13" font-weight="400" >/dev/sdc · SATA hard drive</text>
+<rect x="607" y="421" width="474" height="70" rx="10" fill="#224b69" stroke="#547b98" />
+<rect x="623" y="446" width="20" height="20" rx="4" fill="#258dcf" stroke="#258dcf" />
+<path d="M628 455 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="656" y="452" fill="#f5fbff" font-size="17" font-weight="700" >HDD sdd</text>
+<text x="656" y="474" fill="#c0d7e7" font-size="13" font-weight="400" >/dev/sdd · SATA hard drive</text>
+<text x="100" y="543" fill="#f5fbff" font-size="18" font-weight="700" >Mounted data volumes</text>
+<rect x="100" y="561" width="981" height="70" rx="10" fill="#224b69" stroke="#547b98" />
+<rect x="116" y="586" width="20" height="20" rx="4" fill="#258dcf" stroke="#258dcf" />
+<path d="M121 595 l5 5 9 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="149" y="592" fill="#f5fbff" font-size="17" font-weight="700" >Volume data</text>
+<text x="149" y="614" fill="#c0d7e7" font-size="13" font-weight="400" >/volume1</text>
+<line x1="100" y1="657" x2="1081" y2="657" stroke="#547b98"/>
+<text x="100" y="686" fill="#f5fbff" font-size="14" font-weight="700" >Compare these disks with UGOS Storage before saving.</text>
+<text x="100" y="709" fill="#c0d7e7" font-size="13.5" font-weight="400" >A sleeping HDD is skipped; its previous temperature is not presented as a fresh reading.</text>
+</svg>

@@ -1,17 +1,11 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="src/ugreen_telemetry/web_assets/app-icon-dark.png">
-    <img src="src/ugreen_telemetry/web_assets/app-icon-light.png" width="108" alt="UGREEN Telemetry app icon">
-  </picture>
-</p>
+<img align="right" src="src/ugreen_telemetry/web_assets/app-icon-light.png#gh-light-mode-only" width="96" alt="UGREEN Telemetry app icon, light variant">
+<img align="right" src="src/ugreen_telemetry/web_assets/app-icon-dark.png#gh-dark-mode-only" width="96" alt="UGREEN Telemetry app icon, dark variant">
 
 # UGREEN Telemetry MQTT
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/readme-preview-dark.svg">
-    <img src="docs/images/readme-preview-light.svg" alt="Mockup of the Readings to publish screen in the UGREEN Telemetry setup wizard" width="100%">
-  </picture>
+  <img src="docs/images/readme-preview-light.svg#gh-light-mode-only" alt="Light-mode mockup of Readings to publish" width="100%">
+  <img src="docs/images/readme-preview-dark.svg#gh-dark-mode-only" alt="Dark-mode mockup of Readings to publish" width="100%">
 </p>
 
 Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
@@ -42,10 +36,11 @@ This is a **prototype**, not yet a supported public release. Guided installation
 
 The number of readings depends on the selected disks, mounted volumes, and sensors exposed by the NAS. A missing SMART attribute does not appear as zero.
 
-The browser pilot lets you select each reading and its interval. The mockup above uses the current wizard labels and the choices from the tested DXP4800 Pro pilot; actual choices depend on the NAS. See the [screens from the running pilot](docs/ugos-ui-prototype.md).
+The browser pilot lets you select each reading and its interval. These mockups use the current wizard labels and the choices from the tested DXP4800 Pro pilot; actual choices depend on the NAS. See the [illustrated wizard guide](docs/ugos-ui-prototype.md).
 
 <p align="center">
-  <img src="docs/images/ui-disks-dark.jpg" width="720" alt="Dark-mode screenshot of the pilot's Disks and volumes screen with four SATA HDDs and one mounted data volume selected">
+  <img src="docs/images/storage-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of Disks and volumes">
+  <img src="docs/images/storage-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of Disks and volumes">
 </p>
 
 ## Inspect the code before installing
@@ -96,7 +91,7 @@ If Home Assistant already knows the same NAS from an earlier version, it keeps e
 ## Repository layout
 
 | Path | Purpose |
-| --- | --- |
+| :--- | :--- |
 | `nas-install.py`, `tools/` | Guided setup and `.pyz` builder |
 | `host-smart-snapshot.py`, `systemd/` | Local SMART/volume sampling and timer |
 | `src/ugreen_telemetry/` | Unprivileged MQTT publisher |

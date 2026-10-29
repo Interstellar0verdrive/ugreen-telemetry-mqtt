@@ -2,20 +2,29 @@
 
 This is development code. It has not replaced the tested SSH installer. A private two-container pilot has run against the real broker; fresh installation and public-release update behavior still need validation before this becomes a supported release.
 
-The screens below were captured from the running DXP4800 Pro pilot in dark mode. The token field is empty and no broker credentials or disk serial numbers are shown. The chosen disks and intervals describe that pilot, not settings to copy to another NAS.
+The screens below are light- and dark-mode mockups based on the current wizard. They contain no setup token, broker credentials, or disk serial numbers. The chosen disks and intervals mirror the tested DXP4800 Pro pilot, not settings to copy to another NAS.
 
 ## Intended user journey
 
 1. In UGOS Docker, create one **project** from a short Compose file that points at a tagged GHCR image.
 2. Open `http://NAS-IP:8765` on the trusted LAN. In the UGOS Docker project, select the `setup` container and copy the setup token from its Logs tab. The `reader` container has a separate log.
 
-   ![The pilot's setup-token screen, without an entered token](images/ui-token-dark.jpg)
+   <p align="center">
+     <img src="images/token-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the setup-token screen, with an empty token field">
+     <img src="images/token-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the setup-token screen, with an empty token field">
+   </p>
 
 3. The wizard lists SATA disks by Linux name and shows their HDD/SSD type. Compare the names with UGOS Storage, select the disks and volumes, then enter a dedicated MQTT login and choose reading groups.
 
-   ![Disks and volumes in the running DXP4800 Pro pilot](images/ui-disks-dark.jpg)
+   <p align="center">
+     <img src="images/storage-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the selected disks and volume">
+     <img src="images/storage-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the selected disks and volume">
+   </p>
 
-   ![Readings and intervals in the running DXP4800 Pro pilot](images/ui-readings-dark.jpg)
+   <p align="center">
+     <img src="images/readme-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the reading groups and intervals">
+     <img src="images/readme-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the reading groups and intervals">
+   </p>
 
 4. Save. Each reading uses the selected update interval. The isolated reader schedules SMART checks separately from volume-space checks; SMART intervals have a five-minute minimum. The unprivileged service publishes standard MQTT state topics and Home Assistant MQTT Discovery.
 5. For a later release, review its changelog and use the project's image update control in UGOS. The configuration and MQTT password volumes retain their contents across image replacement. The temporary reader targets and samples are rebuilt after a restart.
