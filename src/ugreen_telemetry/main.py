@@ -80,6 +80,22 @@ def _group_readings(group: str, fast: dict[str, Reading], slow: dict[str, Readin
     return {key: reading for key, reading in source.items() if reading_group(key) == group}
 
 
+SNAPSHOT_GROUPS = ("hdd", "diagnostics", "volume", "nvme")
+
+
+def groups_with_new_readings(active_by_group: dict[str, set[str]],
+                             readings_by_group: dict[str, dict[str, Reading]]) -> set[str]:
+    """Return groups whose readings include keys that their last batch did not publish.
+
+    After a start or restart the first batch can run before the reader has written its
+    snapshot, so storage sensors would stay unavailable for a whole interval. Publishing
+    such a group as soon as its readings appear closes that gap; it also covers a disk
+    that wakes from standby. A group whose keys are unchanged keeps its normal schedule.
+    """
+    return {group for group, readings in readings_by_group.items()
+            if set(readings) - active_by_group.get(group, set())}
+
+
 def run() -> None:
     from paho.mqtt import client as paho
 
@@ -142,9 +158,16 @@ def run() -> None:
     snapshot_gate = FileChangeGate(cfg.smart_snapshot_file) if cfg.smart_snapshot_file is not None else None
     coverage_incomplete = False
     published_generation = -1
+
+    def readings_for(group: str, now: float) -> dict[str, Reading]:
+        return _group_readings(group, fast_cache, slow_cache, hdd_cache, now, fast_sample_at,
+                               slow_sample_at, hdd_sample_at, cfg.fast_interval, cfg.slow_interval,
+                               cfg.hdd_interval, cfg.volume_interval)
+
     try:
         while not stop.is_set():
             now = time.monotonic()
+            snapshot_refreshed = False
             if now >= next_fast:
                 fast_cache = collector.collect_fast()
                 if groups is not None:
@@ -168,6 +191,7 @@ def run() -> None:
                 hdd_cache = _selected(scan.readings, groups) if groups is not None else scan.readings
                 hdd_sample_at = now
                 next_hdd = now + min(cfg.hdd_interval, cfg.volume_interval)
+                snapshot_refreshed = True
                 if cfg.hdd_enabled:
                     incomplete = scan.hdd_count != cfg.expected_hdd_count or scan.covered_hdds != cfg.expected_hdd_count
                     if incomplete and not coverage_incomplete:
@@ -186,11 +210,7 @@ def run() -> None:
                         publisher.reconnect()
                         for group in intervals:
                             if groups is None or group in groups:
-                                publisher.publish_batch(group, _group_readings(group, fast_cache, slow_cache, hdd_cache,
-                                                                                now, fast_sample_at, slow_sample_at,
-                                                                                hdd_sample_at, cfg.fast_interval,
-                                                                                cfg.slow_interval, cfg.hdd_interval,
-                                                                                cfg.volume_interval))
+                                publisher.publish_batch(group, readings_for(group, now))
                                 next_publish[group] = now + intervals[group]
                         if fast_cache or slow_cache or hdd_cache:
                             publisher.online()
@@ -198,14 +218,16 @@ def run() -> None:
                             publisher.offline()
                         published_generation = connection_generation
                     else:
+                        if snapshot_refreshed:
+                            for group in groups_with_new_readings(publisher.active_by_group, {
+                                group: readings_for(group, now) for group in SNAPSHOT_GROUPS
+                                if group in intervals and (groups is None or group in groups)
+                            }):
+                                next_publish[group] = now
                         any_published = False
                         for group, due_at in next_publish.items():
                             if now >= due_at and (groups is None or group in groups):
-                                publisher.publish_batch(group, _group_readings(group, fast_cache, slow_cache, hdd_cache,
-                                                                                now, fast_sample_at, slow_sample_at,
-                                                                                hdd_sample_at, cfg.fast_interval,
-                                                                                cfg.slow_interval, cfg.hdd_interval,
-                                                                                cfg.volume_interval))
+                                publisher.publish_batch(group, readings_for(group, now))
                                 next_publish[group] = now + intervals[group]
                                 any_published = True
                         if any_published:

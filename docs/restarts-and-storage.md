@@ -2,7 +2,7 @@
 
 ## Restart sequence
 
-Both containers use `restart: unless-stopped`: Docker starts them again after a normal daemon or NAS restart, except when someone deliberately stopped them. The configuration and MQTT password are kept in named volumes. The reader's targets and latest snapshot live in a RAM-backed volume, which `setup` rebuilds from the saved configuration after each start. HDD and volume readings return with the reader's next sample; samples missed while the NAS was off are not replayed.
+Both containers use `restart: unless-stopped`: Docker starts them again after a normal daemon or NAS restart, except when someone deliberately stopped them. The configuration and MQTT password are kept in named volumes. The reader's targets and latest snapshot live in a RAM-backed volume, which `setup` rebuilds from the saved configuration after each start. The reader takes its first HDD and volume sample shortly after it starts, and the publisher sends those readings as soon as they appear, usually within a few minutes of the start rather than after a full storage interval. Samples missed while the NAS was off are not replayed.
 
 The publisher reconnects to a broker that becomes available later. It sends retained MQTT Discovery configurations, current values, and availability. Home Assistant can rediscover the device after its own restart from those retained configurations, provided the broker retains them. A value can briefly be unavailable while the NAS, broker, and Home Assistant reconnect, and a brief broker stall can make a single publication time out before the publisher catches up.
 

@@ -2,6 +2,10 @@
 
 All notable changes are documented here. Versions before 0.3.0b1 were private development builds.
 
+## Unreleased
+
+- After a start or restart, HDD and volume readings are published as soon as the reader's first sample arrives, usually within a few minutes. Before, they stayed unavailable in Home Assistant until the next storage interval, 15 minutes by default. A disk that wakes from standby is also published at its next sample instead of waiting for the interval.
+
 ## 0.3.0b1 — 2026-11-15
 
 First public beta. The container image is published on GitHub Container Registry for amd64 and arm64, and the UGOS Docker project follows its `beta` tag.
