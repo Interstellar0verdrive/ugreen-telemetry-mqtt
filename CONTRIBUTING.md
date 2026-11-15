@@ -2,7 +2,7 @@
 
 This is an independent personal prototype. Reports from other UGREEN models are useful, especially two-bay NASes and setups with SATA SSDs or NVMe drives. Contributions are welcome, but there is no promised review or release schedule. The MIT license allows forks and adaptations.
 
-For a compatibility report, include the NAS model, UGOS Pro version, number and type of disks, number of mounted data volumes, installer result, and which sensors appear in Home Assistant. Do **not** post passwords, serial numbers, private network addresses, personal paths, full SMART dumps, `.env`, `host.json`, or the MQTT secret. Redact any output before submitting it.
+For a compatibility report, include the NAS model, UGOS Pro version, number and type of disks, number of mounted data volumes, what the setup wizard discovered, and which sensors appear in Home Assistant. Do **not** post passwords, the setup token, serial numbers, private network addresses, personal paths, full SMART dumps, or the contents of the project's Docker volumes. Redact any output before submitting it.
 
 For code changes, add a meaningful test using simulated data and run:
 

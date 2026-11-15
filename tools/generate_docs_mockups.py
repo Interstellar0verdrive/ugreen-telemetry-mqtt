@@ -1,7 +1,7 @@
 """Build theme-matched UI mockups from the wizard's actual labels.
 
 This is a UI mockup, not a screenshot or a claim about a particular NAS's data.
-The selected/off states and intervals mirror the tested DXP4800 Pro pilot.
+The selected/off states and intervals mirror the tested DXP4800 Pro.
 """
 
 from html import escape

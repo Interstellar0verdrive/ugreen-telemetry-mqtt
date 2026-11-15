@@ -2,13 +2,13 @@
 
 ## Restart sequence
 
-The installer enables `ugreen-telemetry-snapshot.timer` at boot. The timer runs every quarter-hour and has `Persistent=false`, so it does not replay all readings missed while the NAS was off. Docker Compose sets `restart: unless-stopped` for the MQTT publisher: Docker restarts it after a normal daemon/NAS restart, except when someone deliberately stopped the container.
+Both containers use `restart: unless-stopped`: Docker starts them again after a normal daemon or NAS restart, except when someone deliberately stopped them. The configuration and MQTT password are kept in named volumes. The reader's targets and latest snapshot live in a RAM-backed volume, which `setup` rebuilds from the saved configuration after each start. HDD and volume readings return with the reader's next sample; samples missed while the NAS was off are not replayed.
 
-The publisher reconnects to a broker that becomes available later. It sends retained MQTT Discovery configurations, current values, and availability. Home Assistant can rediscover the device after its own restart from those retained configurations, provided the broker retains them. A value can briefly be unavailable while the NAS, broker, and Home Assistant reconnect. After a long NAS shutdown, HDD and volume readings need both a fresh host snapshot and the publisher's next 15-minute poll. This host-installer path has not been tested through a whole-NAS reboot.
+The publisher reconnects to a broker that becomes available later. It sends retained MQTT Discovery configurations, current values, and availability. Home Assistant can rediscover the device after its own restart from those retained configurations, provided the broker retains them. A value can briefly be unavailable while the NAS, broker, and Home Assistant reconnect, and a brief broker stall can make a single publication time out before the publisher catches up.
 
-The separate two-container UGOS browser pilot was tested through a NAS reboot on October 27, 2026. Both containers returned without manual start; its RAM-backed snapshot was recreated and all four HDD temperature entities became available again on the same Home Assistant device. Separate Mosquitto add-on and Home Assistant Core restarts also recovered fresh publication on that device. Both a local code-version upgrade and a private GHCR image switch with rollback retained the pilot's settings and device identity. A public release update and configuration migration remain untested.
+On the tested DXP4800 Pro, both containers came back on their own after NAS reboots and power cycles, and fresh publication resumed after separate Mosquitto add-on and Home Assistant Core restarts, always on the same Home Assistant device. A code upgrade and rollback kept the settings and the device. A public image update and a configuration migration remain untested.
 
-MQTT retained messages hold the latest value or configuration per topic; they are not a historical sample database. Old discovery topics and per-process status topics can remain retained after changes or repeated publisher restarts. A cleanup mechanism is planned before a public release.
+MQTT retained messages hold the latest value or configuration per topic; they are not a historical sample database. Old Discovery topics can remain retained after a reading group is disabled or a disk is removed, and each publisher session leaves a retained status topic. A cleanup mechanism is planned before a public release.
 
 ## Home Assistant Recorder
 

@@ -6,8 +6,5 @@ build/
 *.egg-info/
 secrets/
 .env
-.env.pre-*
-host.json
 snapshots/
-*.pre-cycle-monitor
 build.log

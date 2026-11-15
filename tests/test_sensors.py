@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from ugreen_telemetry import web
 from ugreen_telemetry.probe import inventory
 from ugreen_telemetry.sensors import HostCollector, read_smart_snapshot, scan_disk_temperatures
 
@@ -203,34 +204,18 @@ class SensorTests(unittest.TestCase):
         self.assertEqual(targets, {"archive": Path("/volume2")})
         with self.assertRaises(ValueError):
             helper["validate_targets"](["/dev/sda", "/dev/sda"], {})
-        self.add_disk("sda", 1, "drivetemp", "40000")
-        self.add_disk("sdb", 1, "drivetemp", "41000")
-        installer = runpy.run_path(str(Path(__file__).resolve().parents[1] / "nas-install.py"))
-        with patch("os.path.ismount", return_value=True):
-            config, count = installer["inspect_targets"](["/dev/sda", "/dev/sdb"], ["archive=/volume2"], self.sys)
-        self.assertEqual(config, {"devices": ["/dev/sda", "/dev/sdb"], "volumes": {"archive": "/volume2"}})
-        self.assertEqual(count, 2)
 
-    def test_guided_setup_discovers_two_bay_without_reading_smart(self):
+    def test_wizard_discovers_two_bay_without_reading_smart(self):
         self.add_disk("sda", 1, "drivetemp", "40000")
-        self.add_disk("sdb", 1, "drivetemp", "41000")
-        installer = runpy.run_path(str(Path(__file__).resolve().parents[1] / "nas-install.py"))
-        self.assertEqual([item[0] for item in installer["discover_disks"](self.sys)], ["/dev/sda", "/dev/sdb"])
-        root = Path(self.temp.name) / "mounts"
-        (root / "volume2").mkdir(parents=True)
-        with patch("os.path.ismount", return_value=True):
-            self.assertEqual(installer["discover_volumes"](root), [str(root / "volume2")])
-        answers = ["1,2", "1", "", "", "", "192.0.2.10", "n", "", "", ""]
-        with patch.dict(installer["guided_options"].__globals__, {
-            "discover_disks": lambda: [("/dev/sda", "HDD"), ("/dev/sdb", "HDD")],
-            "discover_volumes": lambda: ["/volume2"],
-        }), patch("socket.gethostname", return_value="UGREEN2"), patch("builtins.input", side_effect=answers):
-            options = installer["guided_options"]()
-        self.assertEqual(options.disk, ["/dev/sda", "/dev/sdb"])
-        self.assertEqual(options.volume, ["data1=/volume2"])
-        self.assertEqual(options.nas_id, "ugreen2")
-        self.assertEqual(options.mqtt_port, 1883)
-
+        self.add_disk("sdb", 0, "drivetemp", "41000")
+        with patch("subprocess.run") as smart:
+            self.assertEqual(web.disk_inventory(self.sys), [
+                {"path": "/dev/sda", "type": "HDD"},
+                {"path": "/dev/sdb", "type": "SATA SSD"},
+            ])
+        smart.assert_not_called()
+        with patch.dict(web.os.environ, {"AVAILABLE_VOLUME_PATHS": "/volume2"}):
+            self.assertEqual(web.volume_inventory(), [{"path": "/host/volume2", "label": "data2"}])
 
 if __name__ == "__main__":
     unittest.main()
