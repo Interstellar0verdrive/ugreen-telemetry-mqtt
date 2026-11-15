@@ -5,8 +5,12 @@ import json
 import re
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
+
+# Time of the latest disk sample that read at least one HDD; kept while all disks sleep.
+HDD_LAST_READING = "hdd_last_reading"
 
 DISK_NAME = re.compile(r"(?:sd[a-z]+|nvme\d+n\d+)\Z")
 CONTROLLER_NAME = re.compile(r"nvme\d+\Z")
@@ -16,8 +20,8 @@ CONTROLLER_NAME = re.compile(r"nvme\d+\Z")
 class Reading:
     key: str
     name: str
-    value: float
-    unit: str
+    value: float | str
+    unit: str | None
     device_class: str | None = None
     state_class: str | None = "measurement"
     entity_category: str | None = None
@@ -172,6 +176,7 @@ def read_smart_snapshot(path: Path, expected_hdd_count: int, max_age: int,
         volume_count = data["volume_count"] if version >= 2 else 0
         if type(volumes) is not list or type(volume_count) is not int or not 0 <= volume_count <= 8 or len(volumes) > volume_count:
             return empty
+        disk_at = sampled_at
         if version == 3:
             disk_at, volume_at = data["disk_sampled_at"], data["volume_sampled_at"]
             if type(disk_at) is not int or type(volume_at) is not int:
@@ -223,6 +228,11 @@ def read_smart_snapshot(path: Path, expected_hdd_count: int, max_age: int,
                 )
     if covered > hdd_count:
         return empty
+    if covered:
+        readings[HDD_LAST_READING] = Reading(
+            HDD_LAST_READING, "HDD last reading",
+            datetime.fromtimestamp(disk_at, timezone.utc).isoformat(), None, "timestamp", None,
+        )
     if hdd_count == expected_hdd_count and covered == expected_hdd_count and covered > 0:
         readings["hdd_max_temperature"] = Reading(
             "hdd_max_temperature", "HDD maximum temperature",

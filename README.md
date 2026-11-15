@@ -49,7 +49,7 @@ Not verified yet: an installation by another user, an installation and an update
 | Reading | Default interval | Home Assistant default |
 | :--- | :--- | :--- |
 | CPU usage, memory usage | 1 minute | Enabled |
-| CPU temperature, SSD/NVMe temperature, HDD temperature, maximum HDD temperature, volume usage, uptime | 15 minutes | Enabled |
+| CPU temperature, SSD/NVMe temperature, HDD temperature, maximum HDD temperature, time of the last HDD reading, volume usage, uptime | 15 minutes | Enabled |
 | Supported HDD SMART counters | 15 minutes, off until chosen in the wizard | Disabled; opt in per entity |
 
 Each reading group has its own interval in the wizard. SMART-based groups have a five-minute minimum. The number of readings depends on the selected disks, mounted volumes, and sensors exposed by the NAS. A missing SMART attribute does not appear as zero.
@@ -73,7 +73,7 @@ Both containers use `restart: unless-stopped`, so Docker starts them again after
 
 ## Storage and load
 
-The publisher retains only the latest MQTT values, rather than an ever-growing MQTT time series. Home Assistant's Recorder stores changed sensor states in its database; its default detailed-history retention is 10 days, while eligible hourly long-term statistics are kept until removed. Repeated unchanged MQTT values are filtered by Home Assistant because this project does not set `force_update`. On the tested four-HDD setup, two sensors publish once a minute and ten active sensors every 15 minutes. That is at most 3,840 state publications per day, not necessarily 3,840 Recorder writes. Check your own Recorder configuration and database growth if you have changed its defaults. [Restart and storage notes](docs/restarts-and-storage.md) explain the estimate and how to opt out of recording particular entities.
+The publisher retains only the latest MQTT values, rather than an ever-growing MQTT time series. Home Assistant's Recorder stores changed sensor states in its database; its default detailed-history retention is 10 days, while eligible hourly long-term statistics are kept until removed. Repeated unchanged MQTT values are filtered by Home Assistant because this project does not set `force_update`. On the tested four-HDD setup, two sensors publish once a minute and eleven active sensors every 15 minutes. That is at most 3,936 state publications per day, not necessarily 3,936 Recorder writes. Check your own Recorder configuration and database growth if you have changed its defaults. [Restart and storage notes](docs/restarts-and-storage.md) explain the estimate and how to opt out of recording particular entities.
 
 ## Security and limitations
 

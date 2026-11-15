@@ -22,7 +22,7 @@ Use a dedicated MQTT login. Its password is stored on the NAS in the `setup` con
 
 ## Data sent to the broker
 
-MQTT messages contain the chosen NAS name and identifier, Linux disk names and derived sensor identifiers, temperatures, selected SMART counters, volume usage, CPU, memory, and uptime. They do not contain disk serial numbers, filenames, full SMART dumps, volume mount paths, or NAS credentials.
+MQTT messages contain the chosen NAS name and identifier, Linux disk names and derived sensor identifiers, temperatures, the time of the last HDD reading, selected SMART counters, volume usage, CPU, memory, and uptime. They do not contain disk serial numbers, filenames, full SMART dumps, volume mount paths, or NAS credentials.
 
 Each HDD's sensor identifier is derived from its hardware path, so it stays stable when Linux names the disks in a different order. The display name, such as "HDD sdb temperature", uses the current Linux name. Moving disks or changing the NAS can still create new entities. Retained MQTT Discovery messages can also leave obsolete entities until they are explicitly cleaned up.
 

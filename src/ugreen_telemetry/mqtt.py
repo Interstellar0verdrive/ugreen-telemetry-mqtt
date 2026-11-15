@@ -76,6 +76,10 @@ class TelemetryPublisher:
             },
             "origin": {"name": "UGREEN Telemetry MQTT", "sw_version": PACKAGE_VERSION},
         }
+        # A timestamp sensor has neither a unit nor a state class.
+        for optional in ("unit_of_measurement", "state_class"):
+            if config[optional] is None:
+                del config[optional]
         if reading.device_class:
             config["device_class"] = reading.device_class
         if reading.entity_category:

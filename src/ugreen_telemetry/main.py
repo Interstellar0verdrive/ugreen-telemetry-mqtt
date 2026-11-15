@@ -13,7 +13,7 @@ from pathlib import Path
 from .config import load_config
 from .file_gate import FileChangeGate
 from .mqtt import TelemetryPublisher
-from .sensors import HostCollector, Reading, read_smart_snapshot
+from .sensors import HDD_LAST_READING, HostCollector, Reading, read_smart_snapshot
 
 
 LOG = logging.getLogger("ugreen_telemetry")
@@ -28,6 +28,8 @@ def reading_group(key: str) -> str:
         return "cpu_temperature"
     if key == "uptime":
         return "uptime"
+    if key == HDD_LAST_READING:
+        return "hdd"
     if key.startswith("volume_"):
         return "volume"
     if key.startswith("nvme_") or key.startswith("ssd_"):
@@ -96,6 +98,15 @@ def groups_with_new_readings(active_by_group: dict[str, set[str]],
             if set(readings) - active_by_group.get(group, set())}
 
 
+def keep_last_reading(readings: dict[str, Reading], last: Reading | None) -> tuple[dict[str, Reading], Reading | None]:
+    """Keep the time of the last HDD reading while every disk sleeps or the snapshot is empty."""
+    if HDD_LAST_READING in readings:
+        return readings, readings[HDD_LAST_READING]
+    if last is None:
+        return readings, None
+    return {**readings, HDD_LAST_READING: last}, last
+
+
 def run() -> None:
     from paho.mqtt import client as paho
 
@@ -148,6 +159,7 @@ def run() -> None:
     fast_cache: dict[str, Reading] = {}
     slow_cache: dict[str, Reading] = {}
     hdd_cache: dict[str, Reading] = {}
+    last_hdd_reading: Reading | None = None
     fast_sample_at = 0.0
     slow_sample_at = 0.0
     hdd_sample_at = 0.0
@@ -188,7 +200,8 @@ def run() -> None:
                     if cfg.smart_snapshot_file is not None
                     else collector.collect_hdd(cfg.expected_hdd_count)
                 )
-                hdd_cache = _selected(scan.readings, groups) if groups is not None else scan.readings
+                snapshot_readings, last_hdd_reading = keep_last_reading(scan.readings, last_hdd_reading)
+                hdd_cache = _selected(snapshot_readings, groups) if groups is not None else snapshot_readings
                 hdd_sample_at = now
                 next_hdd = now + min(cfg.hdd_interval, cfg.volume_interval)
                 snapshot_refreshed = True
