@@ -1,6 +1,6 @@
 # Installation
 
-This is an experimental guide. It has been followed on one DXP4800 Pro; other models still need real-world testing. The screens below are light- and dark-mode mockups of the current wizard. They contain no setup token, broker credentials, or disk serial numbers, and the disks and intervals shown are an example, not settings to copy.
+This is an experimental guide. It has been followed on one DXP4800 Pro; other models still need real-world testing. The screenshots below show the real wizard running with example data, in your browser's light or dark theme. They contain no real token, broker credentials, or disk serial numbers, and the disks and intervals shown are an example, not settings to copy.
 
 ## Before you start
 
@@ -26,23 +26,29 @@ The setup page listens on port 8765. Change the published port in the Compose fi
 2. In UGOS Docker, open the `setup` container's log and copy the setup token. The `reader` container has a separate log. The token proves that you control the NAS; keep it private.
 
    <p align="center">
-     <img src="images/token-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the setup-token screen, with an empty token field">
-     <img src="images/token-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the setup-token screen, with an empty token field">
+     <img src="images/wizard-token-light.webp#gh-light-mode-only" width="100%" alt="The Unlock setup screen with an empty token field, light theme">
+     <img src="images/wizard-token-dark.webp#gh-dark-mode-only" width="100%" alt="The Unlock setup screen with an empty token field, dark theme">
    </p>
 
 3. Enter a display name and a **stable NAS ID**. Home Assistant identifies the device and its entities by this ID, so keep it unchanged later. Then enter the broker address, port, protocol and the dedicated MQTT login. The password is hidden by default and stays on the NAS.
+
+   <p align="center">
+     <img src="images/wizard-nas-light.webp#gh-light-mode-only" width="100%" alt="The NAS and MQTT screen with example values and a hidden password, light theme">
+     <img src="images/wizard-nas-dark.webp#gh-dark-mode-only" width="100%" alt="The NAS and MQTT screen with example values and a hidden password, dark theme">
+   </p>
+
 4. Select the disks and volumes. The wizard lists SATA disks with their HDD/SSD type without reading SMART during discovery. Compare them with UGOS Storage before saving.
 
    <p align="center">
-     <img src="images/storage-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the selected disks and volume">
-     <img src="images/storage-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the selected disks and volume">
+     <img src="images/wizard-storage-light.webp#gh-light-mode-only" width="100%" alt="The Disks and volumes screen with four HDDs and one volume selected, light theme">
+     <img src="images/wizard-storage-dark.webp#gh-dark-mode-only" width="100%" alt="The Disks and volumes screen with four HDDs and one volume selected, dark theme">
    </p>
 
 5. Choose the readings to publish and an interval for each group. SMART-based groups have a five-minute minimum, and volume-space checks are scheduled separately, so a short volume interval does not increase SMART polling.
 
    <p align="center">
-     <img src="images/readme-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the reading groups and intervals">
-     <img src="images/readme-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the reading groups and intervals">
+     <img src="images/wizard-readings-light.webp#gh-light-mode-only" width="100%" alt="The Readings to publish screen with reading groups and their intervals, light theme">
+     <img src="images/wizard-readings-dark.webp#gh-dark-mode-only" width="100%" alt="The Readings to publish screen with reading groups and their intervals, dark theme">
    </p>
 
 6. Save. The publisher restarts with the new settings. New selections or samples can take up to about two minutes to reach MQTT.

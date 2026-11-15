@@ -8,8 +8,8 @@ Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant throug
 It installs as one UGOS Docker project. A browser wizard lets you choose the disks, volumes and readings to publish, and how often each one is sent.
 
 <p align="center">
-  <img src="docs/images/readme-preview-light.svg#gh-light-mode-only" alt="Light-mode mockup of Readings to publish" width="100%">
-  <img src="docs/images/readme-preview-dark.svg#gh-dark-mode-only" alt="Dark-mode mockup of Readings to publish" width="100%">
+  <img src="docs/images/board-readings-light.webp#gh-light-mode-only" alt="The Readings to publish screen of the setup wizard on a desktop browser and on a phone, light theme" width="100%">
+  <img src="docs/images/board-readings-dark.webp#gh-dark-mode-only" alt="The Readings to publish screen of the setup wizard on a desktop browser and on a phone, dark theme" width="100%">
 </p>
 
 > This is a prototype, not yet a supported release. It runs every day on my own DXP4800 Pro, but no public container image has been published yet, and it has not been installed by anyone else. See [what has been verified](#current-status) before trying it.
@@ -59,9 +59,11 @@ Not verified yet: an installation by another user, a public image with the UGOS 
 
 Each reading group has its own interval in the wizard. SMART-based groups have a five-minute minimum. The number of readings depends on the selected disks, mounted volumes, and sensors exposed by the NAS. A missing SMART attribute does not appear as zero.
 
+The wizard follows the browser's light or dark theme and adapts to phone screens. These screenshots show the real wizard running with example data.
+
 <p align="center">
-  <img src="docs/images/storage-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of Disks and volumes">
-  <img src="docs/images/storage-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of Disks and volumes">
+  <img src="docs/images/board-storage-light.webp#gh-light-mode-only" width="100%" alt="The Disks and volumes screen of the setup wizard on a desktop browser and on a phone, light theme">
+  <img src="docs/images/board-storage-dark.webp#gh-dark-mode-only" width="100%" alt="The Disks and volumes screen of the setup wizard on a desktop browser and on a phone, dark theme">
 </p>
 
 ## Install
@@ -97,6 +99,7 @@ If Home Assistant already knows a NAS with the same NAS ID, it keeps the existin
 | `Dockerfile` | Container image shared by both services |
 | `.github/workflows/` | Tests and GHCR image publication on release |
 | `tests/` | Simulated sensor, wizard, reader, and MQTT tests |
+| `tools/docs_screenshots/` | Regenerates the documentation screenshots from the real wizard |
 | `docs/` | Installation, restarts, security, impact, and release notes |
 
 Run local tests with:

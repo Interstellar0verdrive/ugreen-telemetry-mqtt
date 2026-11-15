@@ -8,3 +8,4 @@ secrets/
 .env
 snapshots/
 build.log
+tools/docs_screenshots/demo/
