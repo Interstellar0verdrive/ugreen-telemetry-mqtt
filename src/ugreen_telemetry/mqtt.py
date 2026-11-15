@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import logging
+import time
 from importlib.metadata import PackageNotFoundError, version
 from typing import Protocol
 
@@ -10,6 +12,9 @@ try:
     PACKAGE_VERSION = version("ugreen-telemetry-mqtt")
 except PackageNotFoundError:
     PACKAGE_VERSION = "development"
+
+
+LOG = logging.getLogger("ugreen_telemetry")
 
 
 class PublishResult(Protocol):
@@ -37,18 +42,49 @@ class TelemetryPublisher:
         self.status_topic = f"{self.base}/session/{session_id}/status"
         self.discovered: set[str] = set()
         self.active_by_group: dict[str, set[str]] = {}
+        self._queued: list[PublishResult] = []
+        self._unacknowledged: list[PublishResult] = []
+        self._delayed = False
 
     def reconnect(self) -> None:
-        # Discovery must be offered again after a broker restart.
+        # Discovery must be offered again after a broker restart. Everything is
+        # republished on a new connection, so older acknowledgements no longer matter.
         self.discovered.clear()
+        self._queued.clear()
+        self._unacknowledged.clear()
 
     def _publish(self, topic: str, payload: str) -> None:
         result = self.client.publish(topic, payload, qos=1, retain=True)
         if result.rc != 0:
             raise RuntimeError(f"MQTT publish failed for {topic}: rc={result.rc}")
-        result.wait_for_publish(timeout=10.0)
-        if not result.is_published():
-            raise TimeoutError(f"MQTT publish timeout for {topic}")
+        self._queued.append(result)
+
+    def flush(self, timeout: float = 10.0) -> bool:
+        """Wait up to ``timeout`` in total for the messages queued since the last flush.
+
+        A QoS 1 message the broker has not acknowledged yet is not lost: the MQTT client
+        keeps it and sends it again after a reconnect. A slow acknowledgement is therefore
+        logged once per episode instead of failing the batch and publishing it again.
+        """
+        queued, self._queued = self._queued, []
+        deadline = time.monotonic() + timeout
+        for result in queued:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            result.wait_for_publish(timeout=remaining)
+        self._unacknowledged = [result for result in self._unacknowledged + queued if not result.is_published()]
+        if self._unacknowledged:
+            if not self._delayed:
+                LOG.warning("MQTT broker has not acknowledged %d message(s) within %.0f s; "
+                            "they stay queued and will be delivered when it responds",
+                            len(self._unacknowledged), timeout)
+                self._delayed = True
+            return False
+        if self._delayed:
+            LOG.info("MQTT broker acknowledges messages again")
+            self._delayed = False
+        return True
 
     def _sensor_base(self, key: str) -> str:
         return f"{self.base}/sensor/{key}"

@@ -248,14 +248,16 @@ def run() -> None:
                                 publisher.online()
                             else:
                                 publisher.offline()
-                except (OSError, RuntimeError, TimeoutError) as exc:
+                    publisher.flush()
+                except (OSError, RuntimeError, ValueError) as exc:
                     LOG.error("MQTT publication failed: %s", exc)
             stop.wait(1.0)
     finally:
         if connected.is_set():
             try:
                 publisher.offline()
-            except (OSError, RuntimeError, TimeoutError):
+                publisher.flush(timeout=5.0)
+            except (OSError, RuntimeError, ValueError):
                 pass
         client.disconnect()
         client.loop_stop()

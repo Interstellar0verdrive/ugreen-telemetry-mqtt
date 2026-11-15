@@ -6,6 +6,7 @@ All notable changes are documented here. Versions before 0.3.0b1 were private de
 
 - After a start or restart, HDD and volume readings are published as soon as the reader's first sample arrives, usually within a few minutes. Before, they stayed unavailable in Home Assistant until the next storage interval, 15 minutes by default. A disk that wakes from standby is also published at its next sample instead of waiting for the interval.
 - New **HDD last reading** sensor in the HDD group: the time of the latest sample that read at least one HDD. It keeps that time while every disk sleeps, so Home Assistant can tell a recent temperature from an old one. It is a new entity on the same device; existing entities are unchanged.
+- A broker that is slow to acknowledge no longer produces `MQTT publication failed` errors and repeated publications. Each batch is queued at once and waits at most 10 seconds in total; unacknowledged messages stay queued in the MQTT client and are delivered when the broker responds. The log shows one warning per episode and one line when the broker acknowledges again.
 
 ## 0.3.0b1 — 2026-11-15
 
