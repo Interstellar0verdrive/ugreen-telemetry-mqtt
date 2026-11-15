@@ -12,6 +12,7 @@ It installs as one UGOS Docker project. A browser wizard lets you choose the dis
   <img src="docs/images/board-readings-dark.webp#gh-dark-mode-only" alt="The Readings to publish screen of the setup wizard on a desktop browser and on a phone, dark theme" width="100%">
 </p>
 
+> [!WARNING]
 > This is a prototype, not yet a supported release. It runs every day on my own DXP4800 Pro, but no public container image has been published yet, and it has not been installed by anyone else. See [what has been verified](#current-status) before trying it.
 
 I built this primarily for my own NAS and am sharing it in case it helps someone else. It is a personal project, not an official UGREEN or Home Assistant integration. I cannot promise maintenance, support, compatibility with every model, or a release schedule. Contributions and reports from other devices are welcome. The MIT license allows anyone to fork and adapt the code.
