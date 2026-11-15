@@ -28,16 +28,10 @@ One UGOS Docker project runs two containers from the same image:
 - **`reader`** reads SMART data from the selected SATA disks and the space on the selected volumes. It has no network, no MQTT password and no web port. It writes a small snapshot to a RAM-backed volume.
 - **`setup`** serves the browser wizard on the local network and publishes the selected readings to your MQTT broker with a dedicated login. It has no disk devices and no raw disk access, and runs as an unprivileged user.
 
-```mermaid
-flowchart LR
-  B[Browser on trusted LAN] -->|setup token, configuration| S[setup: wizard + MQTT publisher]
-  S -->|selected targets| R[(RAM-backed snapshot volume)]
-  D[Selected SATA disks and volumes] -->|read-only| C[reader: no network]
-  C -->|readings| R
-  R --> S
-  S -->|outbound MQTT state + Discovery| M[Your MQTT broker]
-  M --> H[Home Assistant]
-```
+<p align="center">
+  <img src="docs/images/architecture-light.svg#gh-light-mode-only" width="100%" alt="Diagram: the setup container serves the browser wizard and publishes outbound MQTT to your broker and Home Assistant; the reader container reads the selected disks without network; both share a RAM-backed snapshot inside one UGOS Docker project">
+  <img src="docs/images/architecture-dark.svg#gh-dark-mode-only" width="100%" alt="Diagram: the setup container serves the browser wizard and publishes outbound MQTT to your broker and Home Assistant; the reader container reads the selected disks without network; both share a RAM-backed snapshot inside one UGOS Docker project">
+</p>
 
 Docker fixes device access when a container starts, so a web wizard cannot safely grant itself access to a disk later. Keeping disk access in a container without network is why there are two containers instead of one. The [security model](docs/security-model.md) has the details.
 
@@ -100,7 +94,7 @@ If Home Assistant already knows a NAS with the same NAS ID, it keeps the existin
 | `Dockerfile` | Container image shared by both services |
 | `.github/workflows/` | Tests and GHCR image publication on release |
 | `tests/` | Simulated sensor, wizard, reader, and MQTT tests |
-| `tools/docs_screenshots/` | Regenerates the documentation screenshots from the real wizard |
+| `tools/docs_screenshots/`, `tools/docs_architecture.py` | Regenerate the documentation screenshots from the real wizard, and the architecture diagram |
 | `docs/` | Installation, restarts, security, impact, and release notes |
 
 Run local tests with:

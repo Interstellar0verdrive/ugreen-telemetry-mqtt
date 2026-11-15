@@ -92,10 +92,10 @@ async function phoneShot(panel) {
 function board(theme, desktopPng, phonePng) {
   const dark = theme === "dark";
   const c = dark
-    ? { bg: "linear-gradient(135deg,#0c2033,#15334d)", bar: "#1d3349", line: "#2f4c66", addr: "#10253a", text: "#c0d7e7" }
-    : { bg: "linear-gradient(135deg,#dceefa,#f4f9fd)", bar: "#eef3f7", line: "#cfdde7", addr: "#ffffff", text: "#466376" };
+    ? { end: "#15334d", bg: "linear-gradient(135deg,#0c2033,#15334d)", bar: "#1d3349", line: "#2f4c66", addr: "#10253a", text: "#c0d7e7" }
+    : { end: "#f4f9fd", bg: "linear-gradient(135deg,#dceefa,#f4f9fd)", bar: "#eef3f7", line: "#cfdde7", addr: "#ffffff", text: "#466376" };
   return `<!doctype html><meta charset="utf-8"><style>
-    html,body{margin:0;background:transparent}
+    html,body{margin:0;background:${c.end}}
     .board{position:relative;box-sizing:border-box;width:1320px;padding:44px 368px 44px 44px;background:${c.bg}}
     .window{border:1px solid ${c.line};border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(4,24,40,${dark ? ".55" : ".18"})}
     .bar{display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;background:${c.bar};border-bottom:1px solid ${c.line}}
@@ -143,10 +143,11 @@ for (const theme of ["light", "dark"]) {
     if (!(await js("[...document.images].every((img) => img.complete && img.naturalWidth > 0)")))
       throw new Error(`Board images did not load for ${name}-${theme}`);
     const rect = await js("(() => { const r = document.getElementById('board').getBoundingClientRect(); return [r.width, r.height]; })()");
-    await send("Emulation.setDeviceMetricsOverride", { width: 1320, height: Math.ceil(rect[1]), deviceScaleFactor: 2, mobile: false });
+    const height = Math.floor(rect[1]);
+    await send("Emulation.setDeviceMetricsOverride", { width: 1320, height, deviceScaleFactor: 2, mobile: false });
     await sleep(300);
     const shot = await send("Page.captureScreenshot", { format: "webp", quality: 90,
-      clip: { x: 0, y: 0, width: rect[0], height: Math.ceil(rect[1]), scale: 1 } });
+      clip: { x: 0, y: 0, width: rect[0], height, scale: 1 } });
     writeFileSync(join(OUT, `board-${name}-${theme}.webp`), Buffer.from(shot.data, "base64"));
   }
 }
