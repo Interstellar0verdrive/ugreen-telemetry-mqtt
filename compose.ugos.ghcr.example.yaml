@@ -1,5 +1,5 @@
 # Future stable-release template. Replace OWNER/REPOSITORY and authenticate to
-# GHCR when using a private image. Current pilot prerelease tags are private.
+# GHCR when using a private image.
 # This is a single UGOS Docker project with two services using the same image.
 services:
   setup:

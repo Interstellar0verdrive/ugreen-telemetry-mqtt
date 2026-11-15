@@ -1,55 +1,62 @@
-# Installation on another UGREEN NAS
+# Installation
 
-This is an experimental guide. The single-file installer was tested from a clean NAS-side setup on a DXP4800 Pro. Other models still need real-world testing.
+This is an experimental guide. It has been followed on one DXP4800 Pro; other models still need real-world testing. The screens below are light- and dark-mode mockups of the current wizard. They contain no setup token, broker credentials, or disk serial numbers, and the disks and intervals shown are an example, not settings to copy.
 
-## Prepare
+## Before you start
 
-1. Enable Home Assistant's MQTT integration and create a dedicated broker login for telemetry. Keep the broker address, port, username, and password outside the repository.
-2. Enable Docker on the NAS and prepare an administrator SSH session. The installer requires Python 3, Docker Compose, systemd, and `/usr/sbin/smartctl`.
-3. In UGOS Storage, identify the SATA disks and mounted data volumes you want to monitor. The installer displays Linux candidates, but you must confirm that the chosen disks belong to the intended pool.
+1. In Home Assistant, enable the MQTT integration and create a **dedicated broker login** for telemetry. Keep the broker address, port, username and password outside this repository.
+2. Enable Docker in UGOS. The first image build needs Internet access to fetch its base image and Python dependency.
+3. In UGOS Storage, note which SATA disks and data volumes you want to monitor. The wizard shows Linux names such as `/dev/sda`, and you must check that each one belongs to the intended pool. A USB disk may also have an `sd*` name.
 
-The package runs a root-owned host helper for SMART reads and an unprivileged container for MQTT publishing. Installation creates `/root/ugreen-telemetry-mqtt`, two systemd unit files, a local configuration and MQTT secret, and a Docker image. These host files are necessary because a fully containerized SMART reader would need direct disk access. The installer does not overwrite an existing setup.
+## Create the UGOS Docker project
 
-## Guided setup
+Until a public image is published, the project builds its image from this source on the NAS.
 
-Copy a release `.pyz` to a shared folder, verify its SHA-256 checksum against the release page, open SSH in that folder, and run:
+1. Download this repository, ideally from a tagged version, and copy it to a folder on the NAS, for example under `/volume1/docker/`.
+2. In UGOS Docker, create a **project** in that folder and use the contents of [`compose.ugos.yaml`](../compose.ugos.yaml) as its Compose file. UGOS builds one image and starts two services from it, `setup` and `reader`.
+3. Check that both containers are running.
 
-```sh
-sudo python3 ugreen-telemetry-mqtt-setup.pyz
-```
+[`compose.ugos.yaml`](../compose.ugos.yaml) mounts only `/volume1` for volume-space readings. For another data volume, add a matching read-only mount to the `reader` service, such as `/volume2:/host/volume2:ro`, and list every mounted volume on the `setup` service with `AVAILABLE_VOLUME_PATHS: /volume1,/volume2`. The wizard labels `/volume1` as `data`, `/volume2` as `data2`, and so on.
 
-Python unpacks the archive into a temporary private folder; `unzip` is not required. The wizard lists `sd*` disks and mounted `/volumeN` paths without opening SMART during discovery. Compare each disk with UGOS Storage before selecting it. A USB disk may also have an `sd*` name.
+The setup page listens on port 8765. Change the published port in the Compose file if it is already taken.
 
-Select disks and volumes, enter a display name and stable NAS identifier, then the broker address, port, protocol, and dedicated username. Review the summary before confirming. The password prompt hides input; the password is not passed on the command line. A successful run starts the systemd timer, takes an initial snapshot, builds the Docker image, and starts the publisher. Home Assistant should then discover the device through the broker.
+## Configure in the browser
 
-The broker must be reachable from the NAS. The first Docker build needs Internet access to fetch its base image and Python dependency. Home Assistant does not need a NAS administrator account.
+1. Open `http://NAS-IP:8765` from a computer on the same trusted LAN.
+2. In UGOS Docker, open the `setup` container's log and copy the setup token. The `reader` container has a separate log. The token proves that you control the NAS; keep it private.
 
-## Explicit two-bay example
+   <p align="center">
+     <img src="images/token-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the setup-token screen, with an empty token field">
+     <img src="images/token-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the setup-token screen, with an empty token field">
+   </p>
 
-From an unpacked source checkout, an equivalent explicit command for two HDDs and `/volume2` is:
+3. Enter a display name and a **stable NAS ID**. Home Assistant identifies the device and its entities by this ID, so keep it unchanged later. Then enter the broker address, port, protocol and the dedicated MQTT login. The password is hidden by default and stays on the NAS.
+4. Select the disks and volumes. The wizard lists SATA disks with their HDD/SSD type without reading SMART during discovery. Compare them with UGOS Storage before saving.
 
-```sh
-sudo python3 nas-install.py \
-  --nas-id nas2bay --nas-name 'UGREEN 2 bay' \
-  --mqtt-host 192.0.2.10 --mqtt-user ugreen_telemetry --mqtt-protocol 5 \
-  --disk /dev/sda --disk /dev/sdb --volume archive=/volume2
-```
+   <p align="center">
+     <img src="images/storage-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the selected disks and volume">
+     <img src="images/storage-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the selected disks and volume">
+   </p>
 
-Replace the example broker address, names, and disk paths. Repeat `--disk` or `--volume LABEL=/mount/path` as needed. The wizard automatically labels chosen volumes `data1`, `data2`, and so on. For an SSD SATA disk, repeat `--disk`; HDD count comes from sysfs, so the SSD does not count as an HDD. SSD temperature is published when available, while this project's SMART counters are HDD-only.
+5. Choose the readings to publish and an interval for each group. SMART-based groups have a five-minute minimum, and volume-space checks are scheduled separately, so a short volume interval does not increase SMART polling.
 
-## Verify
+   <p align="center">
+     <img src="images/readme-preview-light.svg#gh-light-mode-only" width="100%" alt="Light-mode mockup of the reading groups and intervals">
+     <img src="images/readme-preview-dark.svg#gh-dark-mode-only" width="100%" alt="Dark-mode mockup of the reading groups and intervals">
+   </p>
 
-```sh
-systemctl is-enabled ugreen-telemetry-snapshot.timer
-systemctl is-active ugreen-telemetry-snapshot.timer
-systemctl show ugreen-telemetry-snapshot.service -p Result -p ExecMainStatus
-cd /root/ugreen-telemetry-mqtt
-docker compose -f compose.yaml -f compose.smart.yaml ps
-docker compose -f compose.yaml -f compose.smart.yaml logs --tail=20 telemetry
-```
+6. Save. The publisher restarts with the new settings. New selections or samples can take up to about two minutes to reach MQTT.
 
-Do not paste passwords, `.env`, or the secret file into an issue. Check the NAS device in Home Assistant's MQTT integration for current readings. SMART diagnostic entities are disabled by default on first registration. Home Assistant preserves previously recorded enabled/disabled choices when the same NAS identifier is reused; its entity list supports selecting and disabling multiple old diagnostic or obsolete volume entities at once.
+## Check the result
 
-The host helper uses `smartctl -d ata -n standby,0 -A` every 15 minutes. The `-n` option asks smartctl to skip sleeping disks, but controller behavior varies. A sleeping disk's reading becomes unavailable until a fresh valid sample. Confirm standby behavior on each NAS before depending on it.
+In Home Assistant, open the MQTT integration and find the new NAS device. CPU and memory usage should update within a couple of minutes, and HDD and volume readings after the next sample. HDD diagnostic counters are disabled by default; enable the entities you want.
 
-An in-place updater and guided uninstaller do not exist yet. Do not rerun the installer against an existing installation. See [release and update policy](release-and-updates.md).
+Do not paste the setup token, MQTT password, or full container logs into an issue. Redact disk serial numbers and private addresses from anything you share.
+
+## Update
+
+With the source build, replace the files in the project folder with the new version and rebuild the project in UGOS Docker. The settings and MQTT password are kept in the project's named volumes whose names end in `telemetry_config` and `telemetry_secrets`. Read the [changelog](../CHANGELOG.md) first: a version that changes the stored settings format must say so. The [release and update policy](release-and-updates.md) describes how published images will be updated.
+
+## Remove
+
+Stop and delete the project in UGOS Docker. To remove the saved settings and the MQTT password too, also delete its volumes whose names end in `telemetry_config` and `telemetry_secrets`. Retained MQTT Discovery messages stay on the broker until they are cleared, and the Home Assistant device keeps its history until you delete it there.

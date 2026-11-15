@@ -1,6 +1,6 @@
 # Security policy
 
-The project reads SMART as root on the NAS and publishes selected telemetry through a restricted container. The installer stores a dedicated MQTT user's password on the NAS. Never include a password, secret file, serial number, or full SMART dump in an issue or pull request.
+The project reads SMART through a root container without network access and publishes selected telemetry through a separate, unprivileged container. The setup page stores a dedicated MQTT user's password on the NAS. Never include a password, secret file, serial number, or full SMART dump in an issue or pull request.
 
 ## Reporting a vulnerability
 
@@ -10,4 +10,4 @@ This is an experimental personal project: I read every report, but there is no p
 
 The [security model](docs/security-model.md) describes the trust boundaries and what leaves the NAS.
 
-The browser-based UGOS setup is a separate, unreleased prototype. Its local HTTP setup token and MQTT password must be used only on a trusted LAN. The root reader has no network and does not mount MQTT secrets; device access is still under NAS-side validation. See [prototype limits](docs/ugos-ui-prototype.md).
+The project is an unreleased prototype. Its setup page uses local HTTP, so the setup token and MQTT password must be used only on a trusted LAN. The reader's device access is still under NAS-side validation.

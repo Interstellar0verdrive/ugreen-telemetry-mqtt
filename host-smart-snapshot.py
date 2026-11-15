@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Read selected SATA disks and mounted-volume space on the NAS.
 
-Run this separately as an administrator. The MQTT publisher reads its output as
-an ordinary, read-only file and needs no block-device or administrator access.
+The network-isolated reader container runs this with raw disk access. The MQTT
+publisher reads its output as an ordinary file and needs no block-device access.
 """
 
 from __future__ import annotations
@@ -193,7 +193,7 @@ def main() -> int:
     parser.add_argument("--smartctl", type=Path, default=Path("/usr/sbin/smartctl"))
     parser.add_argument("--sys-root", type=Path, default=Path("/sys"))
     parser.add_argument("--device-root", type=Path, default=Path("/dev"), help="mounted host device directory")
-    parser.add_argument("--device-type", choices=("ata", "sat"), default="ata", help="smartctl access path; the host installer uses ata")
+    parser.add_argument("--device-type", choices=("ata", "sat"), default="ata", help="smartctl access path; the reader container uses sat")
     parser.add_argument("--output", type=Path, help="write an atomic JSON snapshot instead of printing it")
     parser.add_argument("--allow-wake", action="store_true", help="allow SMART to wake disks from standby")
     parser.add_argument("--volume", action="append", default=[], metavar="LABEL=PATH", help="read filesystem space only, without listing its contents")
