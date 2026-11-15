@@ -109,3 +109,14 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 See [contributing](CONTRIBUTING.md) before sharing test output. Do not post credentials, disk serial numbers, full SMART dumps, or personal paths.
+
+---
+
+<p align="center">
+<a href="https://ko-fi.com/Interstellar0verdrive">
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/support-kofi-light.webp">
+  <img alt="Enjoying this project? Support independent development on Ko-fi" src="docs/images/support-kofi-dark.webp" width="560">
+</picture>
+</a>
+</p>
