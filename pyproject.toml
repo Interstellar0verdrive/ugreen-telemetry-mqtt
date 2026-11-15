@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ugreen-telemetry-mqtt"
-version = "0.3.0b1"
+version = "0.3.0b2"
 description = "Outbound-only NAS telemetry for Home Assistant MQTT Discovery"
 readme = "README.md"
 requires-python = ">=3.11"

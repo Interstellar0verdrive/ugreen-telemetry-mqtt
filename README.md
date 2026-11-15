@@ -42,9 +42,10 @@ Verified on my DXP4800 Pro with UGOS Pro, four SATA HDDs and one data volume:
 - the wizard's token login, disk and volume discovery, per-reading intervals, and saved settings, with the MQTT password kept in a separate volume;
 - SMART temperatures and counters through the network-isolated reader, without giving the web service any disk access;
 - automatic recovery after NAS reboots and power cycles, and after separate restarts of the Mosquitto broker add-on and Home Assistant Core, keeping the same Home Assistant device and entities;
-- a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback, with settings and entities preserved.
+- a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback, with settings and entities preserved;
+- moving the running project from a source build to the published `beta` image in UGOS, with settings and entities preserved.
 
-Not verified yet: an installation by another user, an installation and an update from the published image through UGOS, a configuration migration, real two-bay hardware, other UGREEN models, and a reader sample taken while an HDD is actually in standby.
+Not verified yet: an installation by another user, a fresh installation and an update between two published images through UGOS, a configuration migration, real two-bay hardware, other UGREEN models, and a reader sample taken while an HDD is actually in standby.
 
 | Reading | Default interval | Home Assistant default |
 | :--- | :--- | :--- |

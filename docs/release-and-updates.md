@@ -8,7 +8,7 @@ Each GitHub Release runs the [publishing workflow](../.github/workflows/publish-
 
 When a newer image is published under the tag you follow, UGOS Docker can show that an update is available. Read the release notes, then update the image and redeploy the project in UGOS. You always start the update; the project never updates itself. The configuration and MQTT password volumes keep their contents across the update.
 
-The update control in UGOS and an update between two published images have not been verified end to end yet. On the tested DXP4800 Pro, a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback with source builds kept the saved settings, the masked MQTT password, and the same Home Assistant device and entities.
+The update control in UGOS and an update between two published images have not been verified end to end yet. On the tested DXP4800 Pro, a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback with source builds kept the saved settings, the masked MQTT password, and the same Home Assistant device and entities. Moving the same project from a source build to the published `beta` image in UGOS kept them too.
 
 A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Avoid automatic image updates until restart and rollback behavior has been tested with published images.
 

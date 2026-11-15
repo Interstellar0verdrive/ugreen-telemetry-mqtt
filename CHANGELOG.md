@@ -2,7 +2,9 @@
 
 All notable changes are documented here. Versions before 0.3.0b1 were private development builds.
 
-## Unreleased
+## 0.3.0b2 — 2026-11-15
+
+Fresher data after restarts and clearer behavior when the broker is slow. No configuration changes are needed, and existing Home Assistant entities keep their identifiers.
 
 - After a start or restart, HDD and volume readings are published as soon as the reader's first sample arrives, usually within a few minutes. Before, they stayed unavailable in Home Assistant until the next storage interval, 15 minutes by default. A disk that wakes from standby is also published at its next sample instead of waiting for the interval.
 - New **HDD last reading** sensor in the HDD group: the time of the latest sample that read at least one HDD. It keeps that time while every disk sleeps, so Home Assistant can tell a recent temperature from an old one. It is a new entity on the same device; existing entities are unchanged.
