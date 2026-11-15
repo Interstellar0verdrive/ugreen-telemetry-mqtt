@@ -1,5 +1,5 @@
-# Development Compose project for UGOS Docker. Replace build with a tagged
-# registry image only after a published release has been tested.
+# UGOS Docker project that builds the image from this source on the NAS.
+# To use the published image instead, see compose.ugos.ghcr.yaml.
 services:
   setup:
     build: .

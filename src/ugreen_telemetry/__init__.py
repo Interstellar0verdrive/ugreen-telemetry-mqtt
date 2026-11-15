@@ -1,3 +1,3 @@
 """Read-only NAS sensors to MQTT Discovery."""
 
-__version__ = "0.3.0.dev2"
+__version__ = "0.3.0b1"

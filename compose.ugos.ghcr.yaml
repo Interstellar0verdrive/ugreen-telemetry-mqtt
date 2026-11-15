@@ -1,9 +1,9 @@
-# Future stable-release template. Replace OWNER/REPOSITORY and authenticate to
-# GHCR when using a private image.
-# This is a single UGOS Docker project with two services using the same image.
+# UGOS Docker project using the published image. Both services use the same image.
+# :beta follows every release, including betas; switch both services to :stable
+# once a stable release exists if you prefer to receive only stable versions.
 services:
   setup:
-    image: ghcr.io/OWNER/REPOSITORY:stable
+    image: ghcr.io/interstellar0verdrive/ugreen-telemetry-mqtt:beta
     entrypoint: ["python", "-m", "ugreen_telemetry.web"]
     restart: unless-stopped
     user: "10001:10001"
@@ -29,7 +29,7 @@ services:
     tmpfs:
       - /tmp:size=16m,mode=1777
   reader:
-    image: ghcr.io/OWNER/REPOSITORY:stable
+    image: ghcr.io/interstellar0verdrive/ugreen-telemetry-mqtt:beta
     entrypoint: ["python", "-m", "ugreen_telemetry.reader"]
     restart: unless-stopped
     user: "0:0"

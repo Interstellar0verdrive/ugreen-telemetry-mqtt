@@ -51,6 +51,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=${{ github.event.release.tag_name }}
+            type=raw,value=beta
             type=raw,value=stable,enable=${{ !github.event.release.prerelease }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}

@@ -13,7 +13,7 @@ It installs as one UGOS Docker project. A browser wizard lets you choose the dis
 </p>
 
 > [!WARNING]
-> This is a prototype, not yet a supported release. It runs every day on my own DXP4800 Pro, but no public container image has been published yet, and it has not been installed by anyone else. See [what has been verified](#current-status) before trying it.
+> This is a beta prototype, not yet a stable release. It runs every day on my own DXP4800 Pro, but it has not yet been installed by anyone else. See [what has been verified](#current-status) before trying it.
 
 I built this primarily for my own NAS and am sharing it in case it helps someone else. It is a personal project, not an official UGREEN or Home Assistant integration. I cannot promise maintenance, support, compatibility with every model, or a release schedule. Contributions and reports from other devices are welcome. The MIT license allows anyone to fork and adapt the code.
 
@@ -44,7 +44,7 @@ Verified on my DXP4800 Pro with UGOS Pro, four SATA HDDs and one data volume:
 - automatic recovery after NAS reboots and power cycles, and after separate restarts of the Mosquitto broker add-on and Home Assistant Core, keeping the same Home Assistant device and entities;
 - a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback, with settings and entities preserved.
 
-Not verified yet: an installation by another user, a public image with the UGOS update control, a configuration migration, real two-bay hardware, other UGREEN models, and a reader sample taken while an HDD is actually in standby.
+Not verified yet: an installation by another user, an installation and an update from the published image through UGOS, a configuration migration, real two-bay hardware, other UGREEN models, and a reader sample taken while an HDD is actually in standby.
 
 | Reading | Default interval | Home Assistant default |
 | :--- | :--- | :--- |
@@ -63,9 +63,9 @@ The wizard follows the browser's light or dark theme and adapts to phone screens
 
 ## Install
 
-Until the first public release, the project is built from this source on the NAS. The [installation guide](docs/installation.md) walks through creating the UGOS Docker project, opening the wizard, and checking the result. Read the code first: the wizard and publisher are in [`src/ugreen_telemetry/`](src/ugreen_telemetry/), and the disk reader uses [`host-smart-snapshot.py`](host-smart-snapshot.py).
+The project is published as a container image on GitHub Container Registry, and UGOS Docker downloads it from a short Compose file. The [installation guide](docs/installation.md) walks through creating the UGOS Docker project, opening the wizard, and checking the result. Read the code first: the wizard and publisher are in [`src/ugreen_telemetry/`](src/ugreen_telemetry/), and the disk reader uses [`host-smart-snapshot.py`](host-smart-snapshot.py).
 
-The [release and update policy](docs/release-and-updates.md) explains how published images and updates are meant to work.
+The [release and update policy](docs/release-and-updates.md) explains image tags and updates.
 
 ## Behavior after restarts
 
@@ -89,8 +89,8 @@ If Home Assistant already knows a NAS with the same NAS ID, it keeps the existin
 | :--- | :--- |
 | `src/ugreen_telemetry/` | Setup wizard, reader schedule, and MQTT publisher |
 | `host-smart-snapshot.py` | SMART and volume sampling used by the reader |
+| `compose.ugos.ghcr.yaml` | UGOS Docker project using the published image |
 | `compose.ugos.yaml` | UGOS Docker project that builds the image from source |
-| `compose.ugos.ghcr.example.yaml` | Template for a future published image |
 | `Dockerfile` | Container image shared by both services |
 | `.github/workflows/` | Tests and GHCR image publication on release |
 | `tests/` | Simulated sensor, wizard, reader, and MQTT tests |

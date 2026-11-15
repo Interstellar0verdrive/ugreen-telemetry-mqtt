@@ -5,18 +5,18 @@ This is an experimental guide. It has been followed on one DXP4800 Pro; other mo
 ## Before you start
 
 1. In Home Assistant, enable the MQTT integration and create a **dedicated broker login** for telemetry. Keep the broker address, port, username and password outside this repository.
-2. Enable Docker in UGOS. The first image build needs Internet access to fetch its base image and Python dependency.
+2. Enable Docker in UGOS. The NAS needs Internet access to download the image, or to build it from source.
 3. In UGOS Storage, note which SATA disks and data volumes you want to monitor. The wizard shows Linux names such as `/dev/sda`, and you must check that each one belongs to the intended pool. A USB disk may also have an `sd*` name.
 
 ## Create the UGOS Docker project
 
-Until a public image is published, the project builds its image from this source on the NAS.
-
-1. Download this repository, ideally from a tagged version, and copy it to a folder on the NAS, for example under `/volume1/docker/`.
-2. In UGOS Docker, create a **project** in that folder and use the contents of [`compose.ugos.yaml`](../compose.ugos.yaml) as its Compose file. UGOS builds one image and starts two services from it, `setup` and `reader`.
+1. Create an empty folder on the NAS for the project, for example `/volume1/docker/ugreen-telemetry`.
+2. In UGOS Docker, create a **project** in that folder and paste the contents of [`compose.ugos.ghcr.yaml`](../compose.ugos.ghcr.yaml) as its Compose file. UGOS downloads the published image from GitHub Container Registry and starts two services from it, `setup` and `reader`.
 3. Check that both containers are running.
 
-[`compose.ugos.yaml`](../compose.ugos.yaml) mounts only `/volume1` for volume-space readings. For another data volume, add a matching read-only mount to the `reader` service, such as `/volume2:/host/volume2:ro`, and list every mounted volume on the `setup` service with `AVAILABLE_VOLUME_PATHS: /volume1,/volume2`. The wizard labels `/volume1` as `data`, `/volume2` as `data2`, and so on.
+The Compose file follows the `beta` image tag, which every release moves, so UGOS can show when a newer image is available. To build the image yourself instead, copy this repository to the project folder and use [`compose.ugos.yaml`](../compose.ugos.yaml); UGOS then has no remote image to watch for updates.
+
+Both Compose files mount only `/volume1` for volume-space readings. For another data volume, add a matching read-only mount to the `reader` service, such as `/volume2:/host/volume2:ro`, and list every mounted volume on the `setup` service with `AVAILABLE_VOLUME_PATHS: /volume1,/volume2`. The wizard labels `/volume1` as `data`, `/volume2` as `data2`, and so on.
 
 The setup page listens on port 8765. Change the published port in the Compose file if it is already taken.
 
@@ -61,7 +61,7 @@ Do not paste the setup token, MQTT password, or full container logs into an issu
 
 ## Update
 
-With the source build, replace the files in the project folder with the new version and rebuild the project in UGOS Docker. The settings and MQTT password are kept in the project's named volumes whose names end in `telemetry_config` and `telemetry_secrets`. Read the [changelog](../CHANGELOG.md) first: a version that changes the stored settings format must say so. The [release and update policy](release-and-updates.md) describes how published images will be updated.
+Read the release notes and the [changelog](../CHANGELOG.md) first: a version that changes the stored settings format must say so. Then update the project's image in UGOS Docker and redeploy it. With the source build, replace the files in the project folder and rebuild the project instead. Either way, the settings and MQTT password stay in the project's named volumes whose names end in `telemetry_config` and `telemetry_secrets`. The [release and update policy](release-and-updates.md) has the details.
 
 ## Remove
 
