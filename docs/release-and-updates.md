@@ -2,7 +2,7 @@
 
 ## Published images
 
-Each GitHub Release runs the [publishing workflow](../.github/workflows/publish-image.yml). It checks that the release tag matches the package version, runs the tests, and publishes amd64 and arm64 images to GitHub Container Registry as `ghcr.io/interstellar0verdrive/ugreen-telemetry-mqtt`. Every image gets its version tag, such as `v0.3.0b1`. Every release, including a beta, also moves the `beta` tag; only a stable release moves `stable`.
+Each GitHub Release runs the [publishing workflow](../.github/workflows/publish-image.yml). It checks that the release tag matches the package version, runs the tests, builds the amd64 and arm64 images and starts both services from each of them with [a smoke test](../tools/smoke_test_image.sh), and only then publishes the images to GitHub Container Registry as `ghcr.io/interstellar0verdrive/ugreen-telemetry-mqtt`. Every image gets its version tag, such as `v0.3.0b1`. Every release, including a beta, also moves the `beta` tag; only a stable release moves `stable`.
 
 [`compose.ugos.ghcr.yaml`](../compose.ugos.ghcr.yaml) follows `beta`. Once a stable release exists, you can switch both services to `stable` to receive only stable versions, or pin an exact version tag to stay on it.
 
@@ -62,8 +62,8 @@ Version numbers follow Python's format: `0.3.0b1` is the first beta of 0.3.0, an
 1. **Done on the tested DXP4800 Pro:** NAS, Mosquitto add-on, and Home Assistant Core restarts recovered publication on the same device. This does not validate a Home Assistant OS reboot.
 2. Measure disk standby behavior with suspension enabled on at least one representative setup; do not generalize one model's result to all controllers.
 3. Install from the published image on a NAS, and update between two published images through the UGOS update control, including a rollback. **Partly done:** the updates from `0.3.0b1` to `0.3.0b2` and from `0.3.0b2` to `0.3.0b3` through the UGOS notice, a rollback to `v0.3.0b1` and the return to `beta` worked on my DXP4800 Pro; a fresh installation remains. Repeat with a substantive configuration change when one exists, and ideally on a second NAS model.
-4. Verify dedicated broker ACLs if they are described as a security boundary, and check that published images contain no secrets or disk serials.
-5. Smoke-test the published amd64 and arm64 images, and document exactly which hardware was tested.
+4. Verify dedicated broker ACLs if they are described as a security boundary, and check that published images contain no secrets or disk serials. **Done for `v0.3.0b3`:** in both images every layer matched its digest, the installed code matched the release commit byte for byte, and no layer held credentials, keys, disk serials, SMART output, or personal paths or addresses. Repeat this for the stable release.
+5. Smoke-test the published amd64 and arm64 images, and document exactly which hardware was tested. **Partly done:** from the release after `0.3.0b3`, the workflows start both services from each image before publishing it, the arm64 one under emulation; the amd64 image runs on my DXP4800 Pro, while no arm64 NAS has run it yet.
 6. **Done on November 15, 2026:** private vulnerability reporting is enabled from the repository's Security tab, as described in [SECURITY.md](../SECURITY.md).
 
 It is reasonable to keep the repository public but low-profile while collecting more operating time and compatibility reports. Community posts or a project listing can wait until the reboot, update, and standby claims have real evidence. If shared, ask for redacted model/firmware and sensor-availability reports, not credentials or full SMART dumps.

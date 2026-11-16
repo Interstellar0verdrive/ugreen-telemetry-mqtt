@@ -18,4 +18,4 @@ ugreen-telemetry = "ugreen_telemetry.main:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ugreen_telemetry = ["web_assets/*.html", "web_assets/*.css", "web_assets/*.js", "web_assets/*.png"]
+ugreen_telemetry = ["web_assets/*.html", "web_assets/*.css", "web_assets/*.js", "web_assets/*.png", "web_assets/*.webp"]

@@ -1,7 +1,7 @@
 # UGREEN Telemetry MQTT
 
-<img align="right" src="src/ugreen_telemetry/web_assets/app-icon-light.png#gh-light-mode-only" width="96" alt="UGREEN Telemetry app icon, light variant">
-<img align="right" src="src/ugreen_telemetry/web_assets/app-icon-dark.png#gh-dark-mode-only" width="96" alt="UGREEN Telemetry app icon, dark variant">
+<img align="right" src="docs/images/app-icon-light.webp#gh-light-mode-only" width="96" alt="UGREEN Telemetry app icon, light variant">
+<img align="right" src="docs/images/app-icon-dark.webp#gh-dark-mode-only" width="96" alt="UGREEN Telemetry app icon, dark variant">
 
 Experimental, outbound-only telemetry from a UGREEN NAS to Home Assistant through MQTT Discovery.
 

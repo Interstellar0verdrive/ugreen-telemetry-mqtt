@@ -106,6 +106,16 @@ class SetupPageTests(unittest.TestCase):
         self.assertIn(b'src="update-check.js', page)
         self.assertIn(b'id="update-check"', page)
 
+    def test_icons_are_small_and_served_with_their_type(self):
+        _headers, page = self.response("/")
+        for name, kind in (("app-icon-light.webp", "image/webp"), ("app-icon-dark.webp", "image/webp"),
+                           ("favicon-light.png", "image/png"), ("favicon-dark.png", "image/png")):
+            with self.subTest(name=name):
+                headers, body = self.response("/" + name)
+                self.assertEqual((headers["code"], headers["Content-Type"]), (200, kind))
+                self.assertLess(len(body), 32 * 1024)
+                self.assertIn(name.encode(), page)
+
 
 if __name__ == "__main__":
     unittest.main()

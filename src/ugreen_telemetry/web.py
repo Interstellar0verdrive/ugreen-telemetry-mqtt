@@ -291,8 +291,10 @@ class Handler(BaseHTTPRequestHandler):
                   "/app.js": ("app.js", "application/javascript; charset=utf-8"),
                   "/update-check.js": ("update-check.js", "application/javascript; charset=utf-8"),
                   "/style.css": ("style.css", "text/css; charset=utf-8"),
-                  "/app-icon-dark.png": ("app-icon-dark.png", "image/png"),
-                  "/app-icon-light.png": ("app-icon-light.png", "image/png")}
+                  "/app-icon-dark.webp": ("app-icon-dark.webp", "image/webp"),
+                  "/app-icon-light.webp": ("app-icon-light.webp", "image/webp"),
+                  "/favicon-dark.png": ("favicon-dark.png", "image/png"),
+                  "/favicon-light.png": ("favicon-light.png", "image/png")}
         if path in assets:
             name, kind = assets[path]
             data = (ASSETS / name).read_bytes()

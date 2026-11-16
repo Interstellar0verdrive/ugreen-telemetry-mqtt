@@ -2,6 +2,12 @@
 
 All notable changes are documented here. Versions before 0.3.0b1 were private development builds.
 
+## Unreleased
+
+- The setup page loads its logo as a 176-pixel WebP image, twice its displayed size, and uses 64-pixel favicons. Before, each visit downloaded about 1.1 MB of 1024-pixel PNG icons; the page now needs under 20 KB for them.
+- The installation wheels no longer remain in a layer of the container image. With the smaller icons, the image is about 4 MB smaller.
+- Before publishing, the release workflow starts both services from the amd64 and the arm64 image and checks the version, the setup page, and a clean stop. Every push runs the same check.
+
 ## 0.3.0b3 — 2026-11-16
 
 An update check in the setup page. No configuration changes are needed, and existing Home Assistant entities keep their identifiers.
