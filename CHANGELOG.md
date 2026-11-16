@@ -2,6 +2,13 @@
 
 All notable changes are documented here. Versions before 0.3.0b1 were private development builds.
 
+## 0.3.0b3 — 2026-11-16
+
+An update check in the setup page. No configuration changes are needed, and existing Home Assistant entities keep their identifiers.
+
+- **Check for updates** in the setup page header, next to the installed version. On request only, the browser asks GitHub for the published releases and says whether a newer one exists, with links to its release notes and to the update steps for UGOS Docker. A beta follows every release; a stable version follows stable releases only. The NAS sends nothing and the setup container opens no new connection; the page's content security policy allows only `api.github.com` besides the NAS itself. The page never updates the project.
+- Stopping or updating the project no longer logs `MQTT connection lost` as a warning; an intentional stop now logs `Disconnected from MQTT broker`.
+
 ## 0.3.0b2 — 2026-11-15
 
 Fresher data after restarts and clearer behavior when the broker is slow. No configuration changes are needed, and existing Home Assistant entities keep their identifiers.
