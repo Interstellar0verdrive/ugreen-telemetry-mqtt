@@ -61,7 +61,7 @@ Do not paste the setup token, MQTT password, or full container logs into an issu
 
 ## Update
 
-Read the release notes and the [changelog](../CHANGELOG.md) first: a version that changes the stored settings format must say so. Then update the project's image in UGOS Docker and redeploy it. With the source build, replace the files in the project folder and rebuild the project instead. Either way, the settings and MQTT password stay in the project's named volumes whose names end in `telemetry_config` and `telemetry_secrets`. The [release and update policy](release-and-updates.md) has the details.
+Read the release notes and the [changelog](../CHANGELOG.md) first: a version that changes the stored settings format must say so. When UGOS Docker marks the project as **Updatable**, update it from the **Project** page, then check the version in the badge at the top of the setup page. If the badge still shows the old version, redeploy the project with **Pull the latest image** ticked. With the source build, replace the files in the project folder and rebuild the project instead. Either way, the settings and MQTT password stay in the project's named volumes whose names end in `telemetry_config` and `telemetry_secrets`. The [release and update policy](release-and-updates.md) has the details.
 
 ## Remove
 

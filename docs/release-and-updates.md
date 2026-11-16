@@ -6,11 +6,32 @@ Each GitHub Release runs the [publishing workflow](../.github/workflows/publish-
 
 [`compose.ugos.ghcr.yaml`](../compose.ugos.ghcr.yaml) follows `beta`. Once a stable release exists, you can switch both services to `stable` to receive only stable versions, or pin an exact version tag to stay on it.
 
-When a newer image is published under the tag you follow, UGOS Docker can show that an update is available. Read the release notes, then update the image and redeploy the project in UGOS. You always start the update; the project never updates itself. The configuration and MQTT password volumes keep their contents across the update.
+You always start an update; the project never updates itself. The configuration and MQTT password volumes keep their contents across an update.
 
-The update control in UGOS and an update between two published images have not been verified end to end yet. On the tested DXP4800 Pro, a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback with source builds kept the saved settings, the masked MQTT password, and the same Home Assistant device and entities. Moving the same project from a source build to the published `beta` image in UGOS kept them too.
+## Updating in UGOS
 
-A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Avoid automatic image updates until restart and rollback behavior has been tested with published images.
+1. **Wait for the notice.** When a release moves the tag you follow, UGOS Docker marks the project and its containers as **Updatable**, and the **Project** page shows a banner such as "1 project can be updated". The check is not immediate: on my NAS the notice appeared about two and a half hours after the release, and for one container before the other.
+2. **Read the release notes**, then choose **Updatable** on the project, or **Update** in the banner, and confirm. UGOS pulls the image again under the same tag and recreates the project's containers with the same Compose configuration. Its warning that data not mounted to the NAS might be lost does not apply to the settings and the MQTT password, which live in named volumes. The reader rebuilds the in-memory snapshot by itself.
+3. **Check the version** in the badge at the top of the setup page. If it still shows the previous version, open the project's **Compose configuration**, choose **Redeploy**, tick **Pull the latest image**, and deploy. This recreates both containers with the new image.
+
+During the update, Home Assistant shows the NAS as unavailable for a few seconds. On my NAS, with 0.3.0b2, the HDD readings came back 67 seconds after the restart.
+
+**Remove `build:` lines.** UGOS treats a service that still has a `build:` line as a locally built image: it never marks that service as updatable, and the project update leaves it on the old image. [`compose.ugos.ghcr.yaml`](../compose.ugos.ghcr.yaml) has none. If you moved a project from a source build to the published image, delete `build: .` and `pull_policy: never` from both services.
+
+**Go back to a previous version** by replacing `beta` with an exact version tag, such as `v0.3.0b1`, in both services and redeploying the project. Readings added by the newer version then become unavailable in Home Assistant.
+
+## What has been verified
+
+On my DXP4800 Pro:
+- a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback with source builds kept the saved settings, the masked MQTT password, and the same Home Assistant device and entities;
+- moving the project from a source build to the published `beta` image kept them too;
+- the update from `0.3.0b1` to `0.3.0b2` through the UGOS notice kept them, and added the new HDD last reading entity. In that update the project update recreated only the reader, because the setup service still had `build: .`; a redeploy with **Pull the latest image** completed it.
+
+Not verified yet:
+- a project update in which UGOS recreates both containers on its own;
+- a rollback between two published images.
+
+A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Avoid automatic image updates until rollback has been tested with published images.
 
 The Compose files grant `SYS_RAWIO` only to the network-isolated reader, alongside its restricted SATA device access. The setup and MQTT service has no disk devices or raw I/O capability. This permission was needed for the SAT access path on the tested DXP4800 Pro and must be reviewed for each supported hardware layout.
 
@@ -36,7 +57,7 @@ Version numbers follow Python's format: `0.3.0b1` is the first beta of 0.3.0, an
 
 1. **Done on the tested DXP4800 Pro:** NAS, Mosquitto add-on, and Home Assistant Core restarts recovered publication on the same device. This does not validate a Home Assistant OS reboot.
 2. Measure disk standby behavior with suspension enabled on at least one representative setup; do not generalize one model's result to all controllers.
-3. Install from the published image on a NAS, and update between two published images through the UGOS update control, including a rollback. Repeat with a substantive configuration change when one exists, and ideally on a second NAS model.
+3. Install from the published image on a NAS, and update between two published images through the UGOS update control, including a rollback. **Partly done:** the update from `0.3.0b1` to `0.3.0b2` through the UGOS notice worked on my DXP4800 Pro; a fresh installation, a project update that recreates both containers on its own, and a rollback remain. Repeat with a substantive configuration change when one exists, and ideally on a second NAS model.
 4. Verify dedicated broker ACLs if they are described as a security boundary, and check that published images contain no secrets or disk serials.
 5. Smoke-test the published amd64 and arm64 images, and document exactly which hardware was tested.
 6. **Done on November 15, 2026:** private vulnerability reporting is enabled from the repository's Security tab, as described in [SECURITY.md](../SECURITY.md).
