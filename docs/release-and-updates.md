@@ -14,7 +14,7 @@ You always start an update; the project never updates itself. The configuration 
 2. **Read the release notes**, then choose **Updatable** on the project, or **Update** in the banner, and confirm. UGOS pulls the image again under the same tag and recreates the project's containers with the same Compose configuration. Its warning that data not mounted to the NAS might be lost does not apply to the settings and the MQTT password, which live in named volumes. The reader rebuilds the in-memory snapshot by itself.
 3. **Check the version** in the badge at the top of the setup page. If it still shows the previous version, open the project's **Compose configuration**, choose **Redeploy**, tick **Pull the latest image**, and deploy. This recreates both containers with the new image.
 
-During the update, Home Assistant shows the NAS as unavailable for a few seconds. On my NAS, with 0.3.0b2, the HDD readings came back 67 seconds after the restart.
+During the update, Home Assistant shows the NAS as unavailable for a few seconds. On my NAS the HDD readings came back 67 seconds after the restart with 0.3.0b2, and 70 seconds after it with 0.3.0b3. Right after the update UGOS may briefly show the project as **Error**, with one of two containers running, while the second one starts; it then shows both running.
 
 **Remove `build:` lines.** UGOS treats a service that still has a `build:` line as a locally built image: it never marks that service as updatable, and the project update leaves it on the old image. [`compose.ugos.ghcr.yaml`](../compose.ugos.ghcr.yaml) has none. If you moved a project from a source build to the published image, delete `build: .` and `pull_policy: never` from both services.
 
@@ -26,9 +26,8 @@ On my DXP4800 Pro:
 - a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback with source builds kept the saved settings, the masked MQTT password, and the same Home Assistant device and entities;
 - moving the project from a source build to the published `beta` image kept them too;
 - the update from `0.3.0b1` to `0.3.0b2` through the UGOS notice kept them, and added the new HDD last reading entity. In that update the project update recreated only the reader, because the setup service still had `build: .`; a redeploy with **Pull the latest image** completed it;
-- a rollback from `0.3.0b2` to `v0.3.0b1` and the return to `beta` kept them too. On `v0.3.0b1` the HDD last reading entity was unavailable, as expected, and after the return it came back with the HDD readings 65 seconds after the restart.
-
-Not verified yet: a project update in which UGOS recreates both containers on its own.
+- a rollback from `0.3.0b2` to `v0.3.0b1` and the return to `beta` kept them too. On `v0.3.0b1` the HDD last reading entity was unavailable, as expected, and after the return it came back with the HDD readings 65 seconds after the restart;
+- the update from `0.3.0b2` to `0.3.0b3` through the UGOS notice, with no `build:` line left, recreated both containers on its own, without a redeploy, and kept them too.
 
 A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Leave **Update as scheduled** off in the same UGOS section, so that the project never updates without you: always read the release notes before updating.
 
@@ -62,7 +61,7 @@ Version numbers follow Python's format: `0.3.0b1` is the first beta of 0.3.0, an
 
 1. **Done on the tested DXP4800 Pro:** NAS, Mosquitto add-on, and Home Assistant Core restarts recovered publication on the same device. This does not validate a Home Assistant OS reboot.
 2. Measure disk standby behavior with suspension enabled on at least one representative setup; do not generalize one model's result to all controllers.
-3. Install from the published image on a NAS, and update between two published images through the UGOS update control, including a rollback. **Partly done:** the update from `0.3.0b1` to `0.3.0b2` through the UGOS notice, a rollback to `v0.3.0b1` and the return to `beta` worked on my DXP4800 Pro; a fresh installation and a project update that recreates both containers on its own remain. Repeat with a substantive configuration change when one exists, and ideally on a second NAS model.
+3. Install from the published image on a NAS, and update between two published images through the UGOS update control, including a rollback. **Partly done:** the updates from `0.3.0b1` to `0.3.0b2` and from `0.3.0b2` to `0.3.0b3` through the UGOS notice, a rollback to `v0.3.0b1` and the return to `beta` worked on my DXP4800 Pro; a fresh installation remains. Repeat with a substantive configuration change when one exists, and ideally on a second NAS model.
 4. Verify dedicated broker ACLs if they are described as a security boundary, and check that published images contain no secrets or disk serials.
 5. Smoke-test the published amd64 and arm64 images, and document exactly which hardware was tested.
 6. **Done on November 15, 2026:** private vulnerability reporting is enabled from the repository's Security tab, as described in [SECURITY.md](../SECURITY.md).

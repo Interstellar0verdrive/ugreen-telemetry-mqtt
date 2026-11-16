@@ -44,7 +44,8 @@ Verified on my DXP4800 Pro with UGOS Pro, four SATA HDDs and one data volume:
 - automatic recovery after NAS reboots and power cycles, and after separate restarts of the Mosquitto broker add-on and Home Assistant Core, keeping the same Home Assistant device and entities;
 - a code upgrade from `0.3.0.dev1` to `0.3.0.dev2` and a rollback, with settings and entities preserved;
 - moving the running project from a source build to the published `beta` image in UGOS, with settings and entities preserved;
-- the update from `0.3.0b1` to `0.3.0b2` through the UGOS update notice, a rollback to `v0.3.0b1` and the return to `beta`, with settings and entities preserved and HDD readings back about a minute after each restart on `0.3.0b2`.
+- the update from `0.3.0b1` to `0.3.0b2` through the UGOS update notice, a rollback to `v0.3.0b1` and the return to `beta`, with settings and entities preserved and HDD readings back about a minute after each restart on `0.3.0b2`;
+- the update from `0.3.0b2` to `0.3.0b3`, in which the UGOS project update recreated both containers by itself.
 
 Not verified yet: an installation by another user, a fresh installation, a configuration migration, real two-bay hardware, other UGREEN models, and a reader sample taken while an HDD is actually in standby.
 
