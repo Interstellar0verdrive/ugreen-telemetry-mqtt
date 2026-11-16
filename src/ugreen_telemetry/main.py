@@ -144,7 +144,10 @@ def run() -> None:
 
     def on_disconnect(_client, _userdata, _flags, _reason_code, _properties):
         connected.clear()
-        LOG.warning("MQTT connection lost")
+        if stop.is_set():
+            LOG.info("Disconnected from MQTT broker")
+        else:
+            LOG.warning("MQTT connection lost")
 
     def request_stop(_signum, _frame):
         stop.set()
