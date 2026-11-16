@@ -10,7 +10,7 @@ You always start an update; the project never updates itself. The configuration 
 
 ## Updating in UGOS
 
-1. **Wait for the notice.** Press **Check for updates** on the setup page to see whether a newer release exists. When a release moves the tag you follow, UGOS Docker marks the project and its containers as **Updatable**, and the **Project** page shows a banner such as "1 project can be updated". The check is not immediate: on my NAS the notice appeared about two and a half hours after the release, and for one container before the other.
+1. **Wait for the notice.** Press **Check for updates** on the setup page to see whether a newer release exists. When a release moves the tag you follow, UGOS Docker marks the project and its containers as **Updatable**, and the **Project** page shows a banner such as "1 project can be updated". The check is not immediate: on my NAS the notice appeared about two and a half hours after the release, and for one container before the other. UGOS shows the notice only while **Update detection** is ticked in Docker under **Management**, **Image update**.
 2. **Read the release notes**, then choose **Updatable** on the project, or **Update** in the banner, and confirm. UGOS pulls the image again under the same tag and recreates the project's containers with the same Compose configuration. Its warning that data not mounted to the NAS might be lost does not apply to the settings and the MQTT password, which live in named volumes. The reader rebuilds the in-memory snapshot by itself.
 3. **Check the version** in the badge at the top of the setup page. If it still shows the previous version, open the project's **Compose configuration**, choose **Redeploy**, tick **Pull the latest image**, and deploy. This recreates both containers with the new image.
 
@@ -30,7 +30,7 @@ On my DXP4800 Pro:
 
 Not verified yet: a project update in which UGOS recreates both containers on its own.
 
-A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Avoid automatic image updates: always read the release notes before updating.
+A new image cannot migrate incompatible settings by itself. Future code changes must keep the stored configuration format or ship an explicit migration, and the release notes must say so. Leave **Update as scheduled** off in the same UGOS section, so that the project never updates without you: always read the release notes before updating.
 
 The Compose files grant `SYS_RAWIO` only to the network-isolated reader, alongside its restricted SATA device access. The setup and MQTT service has no disk devices or raw I/O capability. This permission was needed for the SAT access path on the tested DXP4800 Pro and must be reviewed for each supported hardware layout.
 
