@@ -10,7 +10,7 @@ You always start an update; the project never updates itself. The configuration 
 
 ## Updating in UGOS
 
-1. **Wait for the notice.** When a release moves the tag you follow, UGOS Docker marks the project and its containers as **Updatable**, and the **Project** page shows a banner such as "1 project can be updated". The check is not immediate: on my NAS the notice appeared about two and a half hours after the release, and for one container before the other.
+1. **Wait for the notice.** Press **Check for updates** on the setup page to see whether a newer release exists. When a release moves the tag you follow, UGOS Docker marks the project and its containers as **Updatable**, and the **Project** page shows a banner such as "1 project can be updated". The check is not immediate: on my NAS the notice appeared about two and a half hours after the release, and for one container before the other.
 2. **Read the release notes**, then choose **Updatable** on the project, or **Update** in the banner, and confirm. UGOS pulls the image again under the same tag and recreates the project's containers with the same Compose configuration. Its warning that data not mounted to the NAS might be lost does not apply to the settings and the MQTT password, which live in named volumes. The reader rebuilds the in-memory snapshot by itself.
 3. **Check the version** in the badge at the top of the setup page. If it still shows the previous version, open the project's **Compose configuration**, choose **Redeploy**, tick **Pull the latest image**, and deploy. This recreates both containers with the new image.
 
@@ -38,9 +38,15 @@ The Compose files grant `SYS_RAWIO` only to the network-isolated reader, alongsi
 
 [`compose.ugos.yaml`](../compose.ugos.yaml) builds the image on the NAS from a copy of this repository. It is useful for testing changes, but UGOS has no remote image tag to watch, so it cannot show an "update available" notice. To update, replace the source files and rebuild the project.
 
-## Planned: update check in the wizard
+## Update check in the setup page
 
-The setup page should offer an on-demand **Check for updates** control. It should show the installed version, check the latest release, and link to its release notes. If the check fails or the NAS is offline, it should say that the result is unavailable. It should direct the user to update the image in UGOS Docker; the setup page must not access the Docker socket or perform the update itself.
+The setup page shows the installed version in its header, with a **Check for updates** button next to it. The check runs only when you press the button:
+
+- your browser asks the GitHub API for the published releases; the NAS sends nothing, and the setup container opens no connection. The page's content security policy allows only `api.github.com` besides the NAS itself;
+- a beta or release candidate is compared with every release, and a stable version with stable releases only;
+- when a newer release exists, the page names it and links to its release notes and to the steps above. Otherwise it says you have the latest version, or that GitHub could not be reached.
+
+The page never updates the project and has no access to the Docker socket: you always update from UGOS Docker.
 
 ## Release format
 

@@ -67,7 +67,7 @@ The wizard follows the browser's light or dark theme and adapts to phone screens
 
 The project is published as a container image on GitHub Container Registry, and UGOS Docker downloads it from a short Compose file. The [installation guide](docs/installation.md) walks through creating the UGOS Docker project, opening the wizard, and checking the result. Read the code first: the wizard and publisher are in [`src/ugreen_telemetry/`](src/ugreen_telemetry/), and the disk reader uses [`host-smart-snapshot.py`](host-smart-snapshot.py).
 
-The [release and update policy](docs/release-and-updates.md) explains image tags and updates.
+The setup page has a **Check for updates** button: on request, your browser checks GitHub for a newer release and links to its notes and to the update steps. The [release and update policy](docs/release-and-updates.md) explains image tags and updates.
 
 ## Behavior after restarts
 

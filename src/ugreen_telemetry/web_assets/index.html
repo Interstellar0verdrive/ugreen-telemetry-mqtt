@@ -8,15 +8,22 @@
   <link rel="icon" type="image/png" media="(prefers-color-scheme: dark)" href="app-icon-dark.png">
   <title>UGREEN Telemetry setup</title>
   <link rel="stylesheet" href="style.css">
-  <script src="app.js?v=20261026-3" defer></script>
+  <script src="app.js?v=20261116-1" defer></script>
+  <script src="update-check.js?v=20261116-1" defer></script>
 </head>
 <body>
   <main>
     <header class="masthead">
       <picture class="logo"><source media="(prefers-color-scheme: dark)" srcset="app-icon-dark.png"><img src="app-icon-light.png" alt="" aria-hidden="true"></picture>
       <div class="title-area"><h1>UGREEN Telemetry</h1><p class="intro">Configure which NAS readings to publish to your MQTT broker. The NAS administrator account stays on the NAS.</p></div>
-      <div class="badges"><span class="version">Local preview</span><span class="status" id="verified" hidden>Token verified</span></div>
+      <div class="badges"><span class="version" id="version">Local preview</span><button class="update-check" id="update-check" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 21v-5h-5"/></svg><span id="update-check-label">Check for updates</span></button><span class="status" id="verified" hidden>Token verified</span></div>
     </header>
+    <section class="update" id="update" aria-labelledby="update-title" hidden>
+      <svg class="update-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path class="icon-available" d="M12 16V8m-3.5 3.5L12 8l3.5 3.5"/><path class="icon-current" d="m8.5 12.2 2.4 2.4 4.6-5"/><path class="icon-error" d="M12 7.5v5.5m0 3.4v.1"/></svg>
+      <div class="update-text" role="status" aria-live="polite"><strong id="update-title"></strong><span id="update-detail"></span></div>
+      <div class="update-actions"><a class="update-link is-primary" id="update-notes" target="_blank" rel="noopener noreferrer">Release notes</a><a class="update-link" id="update-guide" target="_blank" rel="noopener noreferrer">How to update</a></div>
+      <button class="update-close" id="update-close" type="button" aria-label="Close update result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </section>
     <form id="login" class="panel" aria-labelledby="unlock-title" novalidate>
       <h2 id="unlock-title">Unlock setup</h2>
       <p class="section-intro">Enter the setup token to access this NAS's telemetry settings.</p>

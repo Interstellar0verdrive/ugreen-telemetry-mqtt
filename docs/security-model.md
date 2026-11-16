@@ -30,6 +30,8 @@ Each HDD's sensor identifier is derived from its hardware path, so it stays stab
 
 The setup page uses local HTTP. The token and the MQTT password cross the LAN unencrypted while you configure it, so use it only on a trusted network and never expose port 8765 through a router or reverse proxy without proper HTTPS and access control.
 
+The **Check for updates** button in the setup page makes your browser, not the NAS, request the list of releases from `api.github.com`, and only when you press it. The page's content security policy allows no other outside address.
+
 With TLS off, MQTT traffic and its password also travel unencrypted over the local network. Use TLS with a verifiable certificate when the network path is not trusted. If you depend on broker ACLs to restrict the dedicated login, verify that the broker actually applies them; do not infer isolation from the username alone. A report about custom ACL behavior in Home Assistant's Mosquitto add-on is tracked [upstream](https://github.com/home-assistant/addons/issues/4721).
 
 The project publishes telemetry only and accepts no MQTT commands. If readings drive fan or safety automations, set plausible limits and a safe behavior when a sensor is unavailable or stale.

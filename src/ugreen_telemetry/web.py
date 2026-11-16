@@ -269,7 +269,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'none'")
+        self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https://api.github.com; form-action 'none'; base-uri 'none'")
         self.end_headers()
         self.wfile.write(data)
 
@@ -289,6 +289,7 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         assets = {"/": ("index.html", "text/html; charset=utf-8"),
                   "/app.js": ("app.js", "application/javascript; charset=utf-8"),
+                  "/update-check.js": ("update-check.js", "application/javascript; charset=utf-8"),
                   "/style.css": ("style.css", "text/css; charset=utf-8"),
                   "/app-icon-dark.png": ("app-icon-dark.png", "image/png"),
                   "/app-icon-light.png": ("app-icon-light.png", "image/png")}
