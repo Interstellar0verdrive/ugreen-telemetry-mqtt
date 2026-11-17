@@ -4,6 +4,7 @@ All notable changes are documented here. Versions before 0.3.0b1 were private de
 
 ## Unreleased
 
+- HDD, volume and SMART diagnostic readings reach Home Assistant within a minute of each new sample. Before, a sample written just after the group's scheduled publication waited a whole interval: with HDD temperatures every 60 minutes, my NAS showed readings one hour old for a whole morning. A disk that goes to sleep is now also shown as unavailable at the sample that finds it asleep.
 - The setup page loads its logo as a 176-pixel WebP image, twice its displayed size, and uses 64-pixel favicons. Before, each visit downloaded about 1.1 MB of 1024-pixel PNG icons; the page now needs under 20 KB for them.
 - The installation wheels no longer remain in a layer of the container image. With the smaller icons, the image is about 4 MB smaller.
 - The setup container no longer logs a `BrokenPipeError` traceback when a browser closes the page or cancels a download while the setup page is still loading. Other errors are still logged.
