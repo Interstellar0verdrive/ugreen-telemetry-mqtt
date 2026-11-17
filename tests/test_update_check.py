@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 from ugreen_telemetry import web
@@ -115,6 +116,26 @@ class SetupPageTests(unittest.TestCase):
                 self.assertEqual((headers["code"], headers["Content-Type"]), (200, kind))
                 self.assertLess(len(body), 32 * 1024)
                 self.assertIn(name.encode(), page)
+
+
+class SetupServerTests(unittest.TestCase):
+    def error_output(self, exc):
+        server = object.__new__(web.SetupServer)
+        output = io.StringIO()
+        with redirect_stderr(output):
+            try:
+                raise exc
+            except Exception:
+                server.handle_error(None, ("192.0.2.1", 50000))
+        return output.getvalue()
+
+    def test_closed_browser_connection_is_not_logged(self):
+        for exc in (BrokenPipeError(32, "Broken pipe"), ConnectionResetError(104, "Connection reset by peer")):
+            with self.subTest(exc=type(exc).__name__):
+                self.assertEqual(self.error_output(exc), "")
+
+    def test_other_errors_still_print_a_traceback(self):
+        self.assertIn("ValueError: unexpected", self.error_output(ValueError("unexpected")))
 
 
 if __name__ == "__main__":

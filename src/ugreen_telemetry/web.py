@@ -10,6 +10,7 @@ import re
 import secrets
 import signal
 import subprocess
+import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -342,6 +343,16 @@ class Handler(BaseHTTPRequestHandler):
         self._json(200, {"saved": True, "config": config})
 
 
+class SetupServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request: object, client_address: object) -> None:
+        # A browser that closes the page or cancels a download mid-response is normal.
+        if isinstance(sys.exc_info()[1], ConnectionError):
+            return
+        super().handle_error(request, client_address)
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     DATA.mkdir(parents=True, exist_ok=True)
@@ -359,8 +370,7 @@ def main() -> None:
     supervisor = PublisherSupervisor()
     thread = threading.Thread(target=supervisor.run, daemon=True)
     thread.start()
-    server = ThreadingHTTPServer((os.environ.get("SETUP_BIND", "0.0.0.0"), int(os.environ.get("SETUP_PORT", "8765"))), Handler)
-    server.daemon_threads = True
+    server = SetupServer((os.environ.get("SETUP_BIND", "0.0.0.0"), int(os.environ.get("SETUP_PORT", "8765"))), Handler)
     def stop(_signum: int, _frame: object) -> None:
         threading.Thread(target=server.shutdown, daemon=True).start()
     signal.signal(signal.SIGTERM, stop)
